@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Lucene.Net.ObjectMapping</id>
+    <version>1.0.0</version>
+    <title>Lucene.Net.ObjectMapping</title>
+    <authors>Roger Keller</authors>
+    <language>en-US</language>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/rokeller/Lucene.Net.ObjectMapping</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Map objects to Lucene.Net Documents and vice versa.</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>lucene.net lucene objectmapping mapping</tags>
+  </metadata>
+</package>
