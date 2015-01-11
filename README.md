@@ -1,6 +1,17 @@
 # Lucene.Net.ObjectMapping
 Mapping of .NET objects to Lucene.Net Documents and vice versa.
 
+Installation
+------------
+Simply download the `Lucene.Net.ObjectMapping` NuGet package like this:
+
+        Install-Package Lucene.Net.ObjectMapping
+
+You are ready to use the object mapping now.
+
+How To Use It
+-------------
+
 Uses JSON Serialization to store the object in the Lucene.Net Document, and indexes each property (also nested properties) individually.
 
 Any object that is JSON serializable (using Newtonsoft.Json) can be mapped to a Document, like this:
