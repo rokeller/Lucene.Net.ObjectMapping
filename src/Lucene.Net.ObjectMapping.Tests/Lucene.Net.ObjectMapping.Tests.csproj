@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IndexExtensionTest.cs" />
     <Compile Include="Model\NestedTestObjectA.cs" />
     <Compile Include="Model\NestedTestObjectB.cs" />
     <Compile Include="Model\NestedTestObjectC.cs" />
