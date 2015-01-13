@@ -5,6 +5,13 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ObjectMapping", "Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj", "{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ObjectMapping.Tests", "Lucene.Net.ObjectMapping.Tests\Lucene.Net.ObjectMapping.Tests.csproj", "{91C415C0-8AA8-46AE-8107-1BF41283402D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A74723A7-6A73-4FB4-8BE6-5DEC7AC206CC}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\packages.config = .nuget\packages.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +22,10 @@ Global
 		{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91C415C0-8AA8-46AE-8107-1BF41283402D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91C415C0-8AA8-46AE-8107-1BF41283402D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91C415C0-8AA8-46AE-8107-1BF41283402D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91C415C0-8AA8-46AE-8107-1BF41283402D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
