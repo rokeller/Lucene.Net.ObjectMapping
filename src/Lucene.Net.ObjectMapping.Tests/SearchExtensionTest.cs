@@ -227,6 +227,169 @@ namespace Lucene.Net.ObjectMapping.Tests
             }
         }
 
+        [Test]
+        public void SearchWithCollector()
+        {
+            const int NumObjects = 10;
+            const int MinNumberInclusive = 0;
+            const int MaxNumberExclusive = 8;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                TopFieldCollector collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search(
+                    typeof(TestObject),
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                TopDocs topDocs = collector.TopDocs();
+
+                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
+            }
+        }
+
+        [Test]
+        public void SearchWithCollectorWithTypeKindCheck()
+        {
+            const int NumObjects = 10;
+            const int MinNumberInclusive = 2;
+            const int MaxNumberExclusive = 7;
+
+            TopFieldCollector collector;
+            TopDocs topDocs;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search(
+                    typeof(TestObject),
+                    DocumentObjectTypeKind.Static,
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                topDocs = collector.TopDocs();
+
+                // The static type of none of the documents matches 'TestObject'.
+                VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
+
+                collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search(
+                    typeof(TestObject),
+                    DocumentObjectTypeKind.Actual,
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                topDocs = collector.TopDocs();
+
+                // The static type of none of the documents matches 'TestObject'.
+                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
+            }
+        }
+
+        [Test]
+        public void SearchGenericWithCollector()
+        {
+            const int NumObjects = 10;
+            const int MinNumberInclusive = 0;
+            const int MaxNumberExclusive = 8;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                TopFieldCollector collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search<TestObject>(
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                TopDocs topDocs = collector.TopDocs();
+
+                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
+            }
+        }
+
+        [Test]
+        public void SearchGenericWithCollectorWithTypeKindCheck()
+        {
+            const int NumObjects = 10;
+            const int MinNumberInclusive = 2;
+            const int MaxNumberExclusive = 7;
+
+            TopFieldCollector collector;
+            TopDocs topDocs;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search<TestObject>(
+                    DocumentObjectTypeKind.Static,
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                topDocs = collector.TopDocs();
+
+                // The static type of none of the documents matches 'TestObject'.
+                VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
+
+                collector = TopFieldCollector.Create(
+                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    NumObjects,
+                    false,
+                    false,
+                    false,
+                    false);
+                searcher.Search<TestObject>(
+                    DocumentObjectTypeKind.Actual,
+                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    collector);
+
+                topDocs = collector.TopDocs();
+
+                // The static type of none of the documents matches 'TestObject'.
+                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
+            }
+        }
+
         [SetUp]
         public void SetUp()
         {

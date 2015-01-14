@@ -137,7 +137,14 @@ namespace Lucene.Net.Documents
         /// </returns>
         public static object ToObject(this Document doc)
         {
-            return ToObject<object>(doc);
+            string actualTypeName = doc.Get(FieldActualType);
+            string staticTypeName = doc.Get(FieldStaticType);
+            string source = doc.Get(FieldSource);
+            string rawTimestamp = doc.Get(FieldTimestamp);
+
+            Type actualType = Type.GetType(actualTypeName);
+
+            return JsonConvert.DeserializeObject(source, actualType, settings);
         }
 
         #endregion

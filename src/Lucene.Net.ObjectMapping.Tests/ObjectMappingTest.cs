@@ -226,5 +226,58 @@ namespace Lucene.Net.ObjectMapping.Tests
                 Assert.AreEqual(a.B.C.Array[i], a2.B.C.Array[i]);
             }
         }
+
+        [Test]
+        public void NonGenericToObject()
+        {
+            DateTime now = DateTime.Now;
+
+            TestObject obj = new TestObject()
+            {
+                Guid = Guid.NewGuid(),
+                Boolean = true,
+                Float = (float)Math.PI,
+                Null = null,
+                Number = 1234,
+                String = "This is a simple string for test 'RoundTrip'.",
+                TimeSpan = TimeSpan.FromDays(Math.E),
+                TimestampLocal = now,
+                TimestampUtc = now.ToUniversalTime(),
+                Uri = new Uri("https://github.com/rokeller/Lucene.Net.ObjectMapping"),
+            };
+
+            Document doc = obj.ToDocument();
+
+            TestObject obj2 = (TestObject)doc.ToObject();
+
+            Assert.AreEqual(obj.Guid, obj2.Guid);
+            Assert.AreEqual(obj.Boolean, obj2.Boolean);
+            Assert.AreEqual(obj.Float, obj2.Float);
+            Assert.AreEqual(obj.Null, obj2.Null);
+            Assert.AreEqual(obj.Number, obj2.Number);
+            Assert.AreEqual(obj.String, obj2.String);
+            Assert.AreEqual(obj.TimeSpan, obj2.TimeSpan);
+            Assert.AreEqual(obj.TimestampLocal, obj2.TimestampLocal);
+            Assert.AreEqual(obj.TimestampUtc, obj2.TimestampUtc);
+            Assert.AreEqual(obj.Uri, obj2.Uri);
+
+            Assert.AreEqual(obj2.TimestampLocal, obj2.TimestampUtc.ToLocalTime());
+        }
+
+        [Test]
+        public void ArgumentExceptionForMissingSettings()
+        {
+            try
+            {
+                TestObject obj = new TestObject();
+                obj.ToDocument(null);
+
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("mappingSettings", ex.ParamName);
+            }
+        }
     }
 }

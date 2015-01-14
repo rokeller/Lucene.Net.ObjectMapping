@@ -223,5 +223,95 @@ namespace Lucene.Net.Search
         }
 
         #endregion
+
+        #region Search with Collector
+
+        /// <summary>
+        /// Searches for documents mapped from the given type using the specified query and Collector.
+        /// </summary>
+        /// <param name="searcher">
+        /// The Searcher to search on.
+        /// </param>
+        /// <param name="type">
+        /// The type of the object to search documents for.
+        /// </param>
+        /// <param name="query">
+        /// The Query which selects the documents.
+        /// </param>
+        /// <param name="results">
+        /// The Collector to use to gather results.
+        /// </param>
+        public static void Search(this Searcher searcher, Type type, Query query, Collector results)
+        {
+            searcher.Search(query, ObjectMapping.GetTypeFilter(type), results);
+        }
+
+        /// <summary>
+        /// Searches for documents mapped from the given type using the specified query and Collector.
+        /// </summary>
+        /// <param name="searcher">
+        /// The Searcher to search on.
+        /// </param>
+        /// <param name="type">
+        /// The type of the object to search documents for.
+        /// </param>
+        /// <param name="kind">
+        /// The kind of type to restrict the search to.
+        /// </param>
+        /// <param name="query">
+        /// The Query which selects the documents.
+        /// </param>
+        /// <param name="results">
+        /// The Collector to use to gather results.
+        /// </param>
+        public static void Search(this Searcher searcher, Type type, DocumentObjectTypeKind kind, Query query, Collector results)
+        {
+            searcher.Search(query, ObjectMapping.GetTypeFilter(type, kind), results);
+        }
+
+        /// <summary>
+        /// Searches for documents mapped from the given type using the specified query and Collector.
+        /// </summary>
+        /// <typeparam name="TObject">
+        /// The type of the object to search documents for.
+        /// </typeparam>
+        /// <param name="searcher">
+        /// The Searcher to search on.
+        /// </param>
+        /// <param name="query">
+        /// The Query which selects the documents.
+        /// </param>
+        /// <param name="results">
+        /// The Collector to use to gather results.
+        /// </param>
+        public static void Search<TObject>(this Searcher searcher, Query query, Collector results)
+        {
+            searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(), results);
+        }
+
+        /// <summary>
+        /// Searches for documents mapped from the given type using the specified query and Collector.
+        /// </summary>
+        /// <typeparam name="TObject">
+        /// The type of the object to search documents for.
+        /// </typeparam>
+        /// <param name="searcher">
+        /// The Searcher to search on.
+        /// </param>
+        /// <param name="kind">
+        /// The kind of type to restrict the search to.
+        /// </param>
+        /// <param name="query">
+        /// The Query which selects the documents.
+        /// </param>
+        /// <param name="results">
+        /// The Collector to use to gather results.
+        /// </param>
+        public static void Search<TObject>(this Searcher searcher, DocumentObjectTypeKind kind, Query query, Collector results)
+        {
+            searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(kind), results);
+        }
+
+        #endregion
     }
 }
