@@ -89,7 +89,7 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.Float:
-                        doc.Add(new NumericField(prefix, Field.Store.NO, true).SetFloatValue((float)value.Value));
+                        doc.Add(new NumericField(prefix, Field.Store.NO, true).SetFloatValue(Convert.ToSingle(value.Value)));
                         break;
 
                     case JTokenType.Guid:
@@ -114,24 +114,7 @@ namespace Lucene.Net.Mapping
                     case JTokenType.Uri:
                         doc.Add(new Field(prefix, value.Value.ToString(), Field.Store.NO, Field.Index.ANALYZED));
                         break;
-                    //case JTokenType.Array:
-                    //    break;
-                    //case JTokenType.Bytes:
-                    //    break;
-                    //case JTokenType.Comment:
-                    //    break;
-                    //case JTokenType.Constructor:
-                    //    break;
-                    //case JTokenType.None:
-                    //    break;
-                    //case JTokenType.Object:
-                    //    break;
-                    //case JTokenType.Property:
-                    //    break;
-                    //case JTokenType.Raw:
-                    //    break;
-                    //case JTokenType.Undefined:
-                    //    break;
+
                     default:
                         Debug.Fail("Unsupported JValue type: " + value.Type);
                         break;

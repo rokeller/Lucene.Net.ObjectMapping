@@ -29,7 +29,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Document doc = obj.ToDocument();
             Assert.NotNull(doc);
-            int remainingFields = 10 /* total fields */ - 1 /* null field */;
+            int remainingFields = 14 /* total fields */ - 1 /* null field */;
 
             foreach (IFieldable field in doc.GetFields())
             {
@@ -99,6 +99,30 @@ namespace Lucene.Net.ObjectMapping.Tests
                         Assert.True(field.IsTokenized);
                         Assert.True(field.IsIndexed);
                         Assert.AreEqual(obj.Uri.ToString(), field.StringValue);
+                        break;
+
+                    case "Double":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(obj.Double.ToString(), field.StringValue);
+                        break;
+
+                    case "Long":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(obj.Long.ToString(), field.StringValue);
+                        break;
+
+                    case "Short":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(obj.Short.ToString(), field.StringValue);
+                        break;
+
+                    case "Byte":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(obj.Byte.ToString(), field.StringValue);
                         break;
 
                     default:

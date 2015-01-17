@@ -14,5 +14,10 @@ namespace Lucene.Net.ObjectMapping.Tests.Model
         public string String { get; set; }
         public TimeSpan TimeSpan { get; set; }
         public Uri Uri { get; set; }
+
+        public double Double { get; set; }
+        public long Long { get; set; }
+        public short Short { get; set; }
+        public byte Byte { get; set; }
     }
 }

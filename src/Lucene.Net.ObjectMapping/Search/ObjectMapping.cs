@@ -64,9 +64,11 @@ namespace Lucene.Net.Search
                 case DocumentObjectTypeKind.Actual:
                     filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldActualType, Utils.GetTypeName(type)));
                     break;
+
                 case DocumentObjectTypeKind.Static:
                     filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldStaticType, Utils.GetTypeName(type)));
                     break;
+
                 default:
                     Debug.Fail("Unsupported DocumentObjectType: " + kind);
                     throw new NotSupportedException(String.Format("The DocumentObjectType '{0}' is not supported.", kind));
