@@ -26,6 +26,11 @@ Similarly, a Document created like called out above can be converted back into a
 
 Since the library stores the actual type of the object when creating a Document, we can always reconstruct the same type of object when deserializing using `ToObject`, provided that the types can be deserialized from JSON.
 
+Read More
+---------
+
+You can read more about Lucene.Net.ObjectMapping on [my blog](http://www.cymbeline.ch/lucene-net-objectmapping/).
+
 Dependencies
 ------------
 This library depends on the following NuGet packages.
