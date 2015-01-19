@@ -5,7 +5,7 @@ Installation
 ------------
 Simply download the `Lucene.Net.ObjectMapping` NuGet package like this:
 
-        Install-Package Lucene.Net.ObjectMapping
+    Install-Package Lucene.Net.ObjectMapping
 
 You are ready to use the object mapping now.
 
@@ -25,6 +25,12 @@ Similarly, a Document created like called out above can be converted back into a
     object myObject = doc.ToObject();
 
 Since the library stores the actual type of the object when creating a Document, we can always reconstruct the same type of object when deserializing using `ToObject`, provided that the types can be deserialized from JSON.
+
+Search for Documents mapped from a specifc class using the extensions to the Searcher, e.g. like this:
+
+    mySearcher.Search<MyClass>(myQuery, numResultsToReturn, mySort);
+
+There are other extensions to the Searcher to, also non-generic ones just in case.
 
 Read More
 ---------

@@ -2,15 +2,15 @@
 <package >
   <metadata>
     <id>Lucene.Net.ObjectMapping</id>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <title>Lucene.Net.ObjectMapping</title>
     <authors>Roger Keller</authors>
     <language>en-US</language>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
     <projectUrl>https://github.com/rokeller/Lucene.Net.ObjectMapping</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Map objects to Lucene.Net Documents and vice versa.</description>
+    <description>Map objects to Lucene.Net Documents and vice versa. Query for Documents based on their mapped types.</description>
     <copyright>Copyright 2015</copyright>
-    <tags>lucene.net lucene objectmapping mapping</tags>
+    <tags>lucene.net lucene objectmapping mapping search</tags>
   </metadata>
 </package>
