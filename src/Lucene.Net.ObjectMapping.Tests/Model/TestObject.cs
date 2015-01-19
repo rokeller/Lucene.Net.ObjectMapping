@@ -16,6 +16,7 @@ namespace Lucene.Net.ObjectMapping.Tests.Model
         public Uri Uri { get; set; }
 
         public double Double { get; set; }
+        public decimal Decimal { get; set; }
         public long Long { get; set; }
         public short Short { get; set; }
         public byte Byte { get; set; }

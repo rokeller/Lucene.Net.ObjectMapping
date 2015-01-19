@@ -25,11 +25,17 @@ namespace Lucene.Net.ObjectMapping.Tests
                 TimestampLocal = now,
                 TimestampUtc = now.ToUniversalTime(),
                 Uri = new Uri("https://github.com/rokeller/Lucene.Net.ObjectMapping"),
+
+                Double = Math.PI,
+                Decimal = new Decimal(Math.E),
+                Long = 98765432109,
+                Short = 987,
+                Byte = 123,
             };
 
             Document doc = obj.ToDocument();
             Assert.NotNull(doc);
-            int remainingFields = 14 /* total fields */ - 1 /* null field */;
+            int remainingFields = 15 /* total fields */ - 1 /* null field */;
 
             foreach (IFieldable field in doc.GetFields())
             {
@@ -105,6 +111,12 @@ namespace Lucene.Net.ObjectMapping.Tests
                         Assert.True(field.IsTokenized);
                         Assert.True(field.IsIndexed);
                         Assert.AreEqual(obj.Double.ToString(), field.StringValue);
+                        break;
+
+                    case "Decimal":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(obj.Decimal.ToString(), field.StringValue);
                         break;
 
                     case "Long":

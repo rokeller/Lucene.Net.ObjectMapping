@@ -89,7 +89,14 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.Float:
-                        doc.Add(new NumericField(prefix, Field.Store.NO, true).SetFloatValue(Convert.ToSingle(value.Value)));
+                        if (value.Value is float)
+                        {
+                            doc.Add(new NumericField(prefix, Field.Store.NO, true).SetFloatValue((float)value.Value));
+                        }
+                        else
+                        {
+                            doc.Add(new NumericField(prefix, Field.Store.NO, true).SetDoubleValue(Convert.ToDouble(value.Value)));
+                        }
                         break;
 
                     case JTokenType.Guid:
