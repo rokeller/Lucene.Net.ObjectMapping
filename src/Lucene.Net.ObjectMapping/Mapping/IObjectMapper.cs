@@ -1,4 +1,6 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Linq;
+using Lucene.Net.Search;
 
 namespace Lucene.Net.Mapping
 {
@@ -20,5 +22,16 @@ namespace Lucene.Net.Mapping
         /// The Document to add the object to.
         /// </param>
         void AddToDocument<TObject>(TObject source, Document doc);
+
+        /// <summary>
+        /// Gets the QueryProvider used by this instance.
+        /// </summary>
+        /// <param name="searcher">
+        /// The Searcher to use for the QueryProvider.
+        /// </param>
+        /// <returns>
+        /// A QueryProvider.
+        /// </returns>
+        QueryProvider GetQueryProvider(Searcher searcher);
     }
 }

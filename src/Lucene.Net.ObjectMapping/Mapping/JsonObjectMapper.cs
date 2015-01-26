@@ -1,4 +1,6 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Linq;
+using Lucene.Net.Search;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -45,6 +47,20 @@ namespace Lucene.Net.Mapping
         {
             JToken token = JToken.FromObject(source, serializer);
             Add(doc, null, token);
+        }
+
+        /// <summary>
+        /// Gets the QueryProvider used by this instance.
+        /// </summary>
+        /// <param name="searcher">
+        /// The Searcher to use for the QueryProvider.
+        /// </param>
+        /// <returns>
+        /// A QueryProvider.
+        /// </returns>
+        public QueryProvider GetQueryProvider(Searcher searcher)
+        {
+            return new JsonObjectMapperQueryProvider(searcher);
         }
 
         #endregion
@@ -197,6 +213,32 @@ namespace Lucene.Net.Mapping
             else
             {
                 return add.ToString();
+            }
+        }
+
+        #endregion
+
+        #region Helper Classes
+
+        /// <summary>
+        /// Implements a QueryProvider for the JsonObjectMapper.
+        /// </summary>
+        private sealed class JsonObjectMapperQueryProvider : QueryProvider
+        {
+            /// <summary>
+            /// Initializes a new instance of JsonObjectMapperQueryProvider.
+            /// </summary>
+            /// <param name="searcher">
+            /// The Searcher to use.
+            /// </param>
+            public JsonObjectMapperQueryProvider(Searcher searcher) : base(searcher) { }
+
+            /// <summary>
+            /// Gets the FieldNameResolver to use with this instance.
+            /// </summary>
+            public override MappedFieldResolver FieldNameResolver
+            {
+                get { return new JsonFieldNameResolver(); }
             }
         }
 
