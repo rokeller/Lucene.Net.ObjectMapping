@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Documents;
+﻿using Lucene.Net.Analysis;
+using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using System;
 
@@ -9,6 +10,231 @@ namespace Lucene.Net.Index
     /// </summary>
     public static class ObjectMappingExtensions
     {
+        #region Add
+
+        /// <summary>
+        /// Adds the specified object to the given IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to add.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to use.
+        /// </param>
+        /// <param name="obj">
+        /// The object to write.
+        /// </param>
+        public static void Add<T>(this IndexWriter writer, T obj)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+
+            writer.AddDocument(obj.ToDocument());
+        }
+
+        /// <summary>
+        /// Adds the specified object to the given IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to add.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to use.
+        /// </param>
+        /// <param name="obj">
+        /// The object to write.
+        /// </param>
+        /// <param name="analyzer">
+        /// The Analyzer to use.
+        /// </param>
+        public static void Add<T>(this IndexWriter writer, T obj, Analyzer analyzer)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == analyzer)
+            {
+                throw new ArgumentNullException("analyzer");
+            }
+
+            writer.AddDocument(obj.ToDocument(), analyzer);
+        }
+
+        #endregion
+
+        #region Update
+
+        /// <summary>
+        /// Updates the specified object in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="obj">
+        /// The new object to write.
+        /// </param>
+        /// <param name="selection">
+        /// The Query which selects the item in the index.
+        /// </param>
+        public static void Update<T>(this IndexWriter writer, T obj, Query selection)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == selection)
+            {
+                throw new ArgumentNullException("selection");
+            }
+
+            writer.DeleteDocuments<T>(selection);
+            writer.AddDocument(obj.ToDocument());
+        }
+
+        /// <summary>
+        /// Updates the specified object in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="obj">
+        /// The new object to write.
+        /// </param>
+        /// <param name="kind">
+        /// The kind of type to restrict the update operation to.
+        /// </param>
+        /// <param name="selection">
+        /// The Query which selects the item in the index.
+        /// </param>
+        public static void Update<T>(this IndexWriter writer, T obj, DocumentObjectTypeKind kind, Query selection)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == selection)
+            {
+                throw new ArgumentNullException("selection");
+            }
+
+            writer.DeleteDocuments<T>(kind, selection);
+            writer.AddDocument(obj.ToDocument());
+        }
+
+        /// <summary>
+        /// Updates the specified object in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="obj">
+        /// The new object to write.
+        /// </param>
+        /// <param name="selection">
+        /// The Query which selects the item in the index.
+        /// </param>
+        /// <param name="analyzer">
+        /// The Analyzer to use.
+        /// </param>
+        public static void Update<T>(this IndexWriter writer, T obj, Query selection, Analyzer analyzer)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == selection)
+            {
+                throw new ArgumentNullException("selection");
+            }
+            else if (null == analyzer)
+            {
+                throw new ArgumentNullException("analyzer");
+            }
+
+            writer.DeleteDocuments<T>(selection);
+            writer.AddDocument(obj.ToDocument(), analyzer);
+        }
+
+        /// <summary>
+        /// Updates the specified object in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="obj">
+        /// The new object to write.
+        /// </param>
+        /// <param name="kind">
+        /// The kind of type to restrict the update operation to.
+        /// </param>
+        /// <param name="selection">
+        /// The Query which selects the item in the index.
+        /// </param>
+        /// <param name="analyzer">
+        /// The Analyzer to use.
+        /// </param>
+        public static void Update<T>(this IndexWriter writer, T obj, DocumentObjectTypeKind kind, Query selection, Analyzer analyzer)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == selection)
+            {
+                throw new ArgumentNullException("selection");
+            }
+            else if (null == analyzer)
+            {
+                throw new ArgumentNullException("analyzer");
+            }
+
+            writer.DeleteDocuments<T>(kind, selection);
+            writer.AddDocument(obj.ToDocument(), analyzer);
+        }
+
+        #endregion
+
+        #region DeleteDocuments
+
         /// <summary>
         /// Deletes the documents for objects of the given type matching the given selection.
         /// </summary>
@@ -90,5 +316,7 @@ namespace Lucene.Net.Index
 
             writer.DeleteDocuments(deleteQuery);
         }
+
+        #endregion
     }
 }
