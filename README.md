@@ -24,7 +24,23 @@ Similarly, a Document created like called out above can be converted back into a
     // or
     object myObject = doc.ToObject();
 
-Since the library stores the actual type of the object when creating a Document, we can always reconstruct the same type of object when deserializing using `ToObject`, provided that the types can be deserialized from JSON.
+Since the library stores the actual type of the object when creating a Document, we can always reconstruct the same type
+of object when deserializing using `ToObject`, provided that the types can be deserialized from JSON.
+
+You can add your documents to your indices the usual way, or you can add an object to an IndexWriter like this:
+
+    myIndexWriter.Add(myObject);
+    // or
+    myIndexWriter.Add(myObject, myAnalyzer);
+
+Updating existing documents is just as easy. Like the `UpdateDocument` method on the `IndexReader`, it will delete the
+documents that match the given query and then just add the new document. Use it like this:
+
+    myIndexWriter.Update(myObject, new TermQuery(new Term("Id", myObject.Id)));
+    // or
+    myIndexWriter.Update(myObject, new TermQuery(new Term("Id", myObject.Id)), myAnalyzer);
+
+Please note that it is not necessary to filter for the document type in your query. The `Update` method does it automatically.
 
 Search for Documents mapped from a specifc class using the extensions to the Searcher, e.g. like this:
 
