@@ -18,6 +18,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{125C
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{64F7F2A4-0FA8-4F95-88A7-CF9CF2E0B594}"
+	ProjectSection(SolutionItems) = preProject
+		..\tools\build.cmd = ..\tools\build.cmd
+		..\tools\pack.cmd = ..\tools\pack.cmd
+		..\tools\publish.cmd = ..\tools\publish.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
