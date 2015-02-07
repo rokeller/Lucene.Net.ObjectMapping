@@ -1,5 +1,4 @@
 ﻿using Lucene.Net.Search;
-using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -106,7 +105,7 @@ namespace Lucene.Net.Mapping
                         return Visit(StripQuotes(node));
 
                     default:
-                        throw new NotSupportedException(String.Format("The unary operator '{0}' is not supported", node.NodeType));
+                        return base.VisitUnary(node);
                 }
             }
 

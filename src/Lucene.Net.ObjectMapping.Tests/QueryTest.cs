@@ -2,6 +2,7 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Linq;
+using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
@@ -31,12 +32,12 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                Assert.AreEqual(NumObjects, searcher.Query<TestObject>().Count());
-                Assert.AreEqual(NumObjects, searcher.Query<NestedTestObjectC>().Count());
-                Console.WriteLine("Query: {0}", searcher.Query<TestObject>());
-                Console.WriteLine("Query: {0}", searcher.Query<NestedTestObjectC>());
+                Assert.AreEqual(NumObjects, searcher.AsQueryable<TestObject>().Count());
+                Assert.AreEqual(NumObjects, searcher.AsQueryable<NestedTestObjectC>().Count());
+                Console.WriteLine("Query: {0}", searcher.AsQueryable<TestObject>());
+                Console.WriteLine("Query: {0}", searcher.AsQueryable<NestedTestObjectC>());
 
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Number.InRange(null, MaxNumberExclusive, false, false));
                 Console.WriteLine("Query: {0}", query);
 
@@ -63,7 +64,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Number.InRange(MinNumberInclusive, MaxNumberExclusive, true, false))
                     .OrderByDescending(t => t.Number);
                 Console.WriteLine("Query: {0}", query);
@@ -91,9 +92,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
                 // None of the objects have the term 'Test', they only have 'test'.
-                Assert.AreEqual(0, searcher.Query<TestObject>().Where(t => t.String.MatchesTerm("Test")).Count());
+                Assert.AreEqual(0, searcher.AsQueryable<TestObject>().Where(t => t.String.MatchesTerm("Test")).Count());
 
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.String.MatchesTerm("test"))
                     .OrderBy(t => t.Number);
                 Console.WriteLine("Query: {0}", query);
@@ -107,7 +108,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 }
 
                 // Look for TestObject with '7' in the String.
-                query = from t in searcher.Query<TestObject>()
+                query = from t in searcher.AsQueryable<TestObject>()
                         where t.String.MatchesTerm("7")
                         select t;
                 Console.WriteLine("Query: {0}", query);
@@ -129,7 +130,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Guid.MatchesTerm(guid.ToString()));
                 Console.WriteLine("Query: {0}", query);
 
@@ -151,7 +152,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                IQueryable<TestObject> query = searcher.Query<TestObject>().OrderBy(t => t.Long).ThenByDescending(t => t.Number);
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>().OrderBy(t => t.Long).ThenByDescending(t => t.Number);
                 Console.WriteLine("Query: {0}", query);
 
                 Stopwatch watch = Stopwatch.StartNew();
@@ -165,7 +166,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 TestObject[] results = query.ToArray();
                 watch.Stop();
 
-                Console.WriteLine("Determining the count of the query ({0}) took {1}ms. That's {2}ms per item.",
+                Console.WriteLine("Converting the results of the query ({0}) to an array took {1}ms. That's {2}ms per item.",
                     query, watch.ElapsedMilliseconds, 1f * watch.ElapsedMilliseconds / results.Length);
                 Assert.AreEqual(NumObjects, results.Length);
                 long lastVal = results[0].Long;
@@ -191,7 +192,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .OrderBy(t => t.Long)
                     .ThenByDescending(t => t.Number)
                     .Take(PageSize);
@@ -202,7 +203,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 long lastVal = results[PageSize - 1].Long;
 
-                query = (from t in searcher.Query<TestObject>()
+                query = (from t in searcher.AsQueryable<TestObject>()
                          orderby t.Long
                          select t).Skip(PageSize);
                 Assert.AreEqual(NumObjects - PageSize, query.Count());
@@ -211,7 +212,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 Assert.LessOrEqual(lastVal, results[0].Long);
                 Assert.LessOrEqual(results[0].Long, results[NumObjects - PageSize - 1].Long);
 
-                query = (from t in searcher.Query<TestObject>()
+                query = (from t in searcher.AsQueryable<TestObject>()
                          orderby t.Long
                          select t).Take(PageSize).Skip(2 * PageSize);
                 Assert.AreEqual(NumObjects - 2 * PageSize, query.Count());
@@ -232,7 +233,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
-                IQueryable<TestObject> query = searcher.Query<TestObject>()
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Number.InRange(null, 5, false, false))
                     .OrderByDescending(t => t.Number);
                 Console.WriteLine("Query: {0}", query);
@@ -259,9 +260,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
                 // None of the objects have the term 'Number', they only have 'number'.
-                Assert.AreEqual(0, searcher.Query<NestedTestObjectB>().Where(t => t.C.String.MatchesTerm("Number")).Count());
+                Assert.AreEqual(0, searcher.AsQueryable<NestedTestObjectB>().Where(t => t.C.String.MatchesTerm("Number")).Count());
 
-                IQueryable<NestedTestObjectB> query = searcher.Query<NestedTestObjectB>()
+                IQueryable<NestedTestObjectB> query = searcher.AsQueryable<NestedTestObjectB>()
                     .Where(t => t.C.String.MatchesTerm("number"))
                     .OrderByDescending(t => t.Id);
                 Console.WriteLine("Count: {0}, Query: {1}", query.Count(), query);
@@ -275,7 +276,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 }
 
                 // Look for NestedTestObjectB with '5' in the String of the nested C object.
-                query = from b in searcher.Query<NestedTestObjectB>()
+                query = from b in searcher.AsQueryable<NestedTestObjectB>()
                         where b.C.String.MatchesTerm("5")
                         select b;
                 Console.WriteLine("Count: {0}, Query: {1}", query.Count(), query);
@@ -286,7 +287,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 // Look for NestedTestObjectB with 'random' in the String of the nested C object array. We should get
                 // all the objects back, since all of them have at least one string with 'Random' in the array.
-                query = from b in searcher.Query<NestedTestObjectB>()
+                query = from b in searcher.AsQueryable<NestedTestObjectB>()
                         where b.C.Array.MatchesTerm("random")
                         orderby b.C.String
                         select b;
@@ -307,7 +308,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             using (Searcher searcher = new IndexSearcher(dir, true))
             {
                 // Query on float range.
-                IQueryable<TestObject> query = from t in searcher.Query<TestObject>()
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
                                                where t.Float.InRange(5, 8, false, false) // Include 5-7
                                                orderby t.Number descending
                                                select t;
@@ -321,7 +322,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 }
 
                 // Query on double range.
-                query = from t in searcher.Query<TestObject>()
+                query = from t in searcher.AsQueryable<TestObject>()
                         where t.Double.InRange(21.99, 28.28, false, true) // Include 7-9
                         orderby t.Float
                         select t;
@@ -335,7 +336,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 }
 
                 // Query on decimal range.
-                query = from t in searcher.Query<TestObject>()
+                query = from t in searcher.AsQueryable<TestObject>()
                         where t.Decimal.InRange(8, 16.31m, false, false) // Include 3-6
                         orderby t.Decimal
                         select t;
@@ -347,6 +348,476 @@ namespace Lucene.Net.ObjectMapping.Tests
                 {
                     Assert.AreEqual(3 + i, results[i].Number);
                 }
+            }
+        }
+
+        [Test]
+        public void BasicEquals()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact number match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number == 6
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(6, results[0].Number);
+
+                // Query on an exact float match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where 4.0404040404f == t.Float
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(4, results[0].Number);
+
+                // Query on an exact double match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where (Math.PI * 8).Equals(t.Double)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(8, results[0].Number);
+
+                // Query on an exact decimal match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Decimal.Equals(new Decimal(Math.E) * 3)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(3, results[0].Number);
+
+                // Query on string term match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.String == "5"
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(5, results[0].Number);
+
+                // Query on string term match - with Equals.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.String.Equals("test")
+                        orderby t.Number
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(10, results.Length);
+
+                for (int i = 0; i < results.Length; i++)
+                {
+                    Assert.AreEqual(i, results[i].Number);
+                }
+            }
+        }
+
+        [Test]
+        public void BasicNotEquals()
+        {
+            const int NumObjects = 10;
+            TestObject theOtherObject = new TestObject() { Number = 6 };
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact number match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number != theOtherObject.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(6, result.Number);
+                }
+
+                // Query on an exact float match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where 4.0404040404f != t.Float
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(4, result.Number);
+                }
+
+                // Query on an exact double match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !(Math.PI * 8).Equals(t.Double)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(8, result.Number);
+                }
+
+                // Query on an exact decimal match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !t.Decimal.Equals(new Decimal(Math.E) * 3)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(3, result.Number);
+                }
+
+                // Query on string term match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !(t.String == "5")
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(5, result.Number);
+                }
+
+                // Query on string term match - with Equals.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !t.String.Equals("test")
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(0, results.Length);
+            }
+        }
+
+        [Test]
+        public void ComplexEqualsAndNotEquals()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact number match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.String == "object" && !(t.Number == 6)
+                                               orderby GenericField.Timestamp
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                int lastNum = -1;
+                foreach (TestObject result in results)
+                {
+                    Assert.Greater(result.Number, lastNum);
+                    lastNum = result.Number;
+                    Assert.AreNotEqual(6, result.Number);
+                }
+
+                // Query on an exact number match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.String != "blah" && (t.Number == 6)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(6, results[0].Number);
+            }
+        }
+
+        [Test]
+        public void ComplexEqualsOrNotEquals()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact number match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.String == "object" || !(t.Number == 6)
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(NumObjects, results.Length);
+                for (int i = 0; i < NumObjects; i++)
+                {
+                    Assert.AreEqual(i, results[i].Number);
+                }
+
+                // Query on an exact number match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.String == "blah" || (t.Number == 6)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(6, results[0].Number);
+            }
+        }
+
+        [Test]
+        public void GuidEquals()
+        {
+            const int NumObjects = 10;
+            Guid theGuid;
+
+            theGuid = WriteTestObjectsWithGuid(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact GUID match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Guid == theGuid
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(theGuid, results[0].Guid);
+
+                // Query on an exact GUID match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !t.Guid.Equals(theGuid)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(NumObjects - 1, results.Length);
+                foreach (TestObject result in results)
+                {
+                    Assert.AreNotEqual(theGuid, result.Guid);
+                }
+            }
+        }
+
+        [Test]
+        public void EnumEquals()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on an exact GUID match.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Enum == MyEnum.First
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(3, results.Length);
+                Assert.AreEqual(0, results[0].Number);
+                Assert.AreEqual(4, results[1].Number);
+                Assert.AreEqual(8, results[2].Number);
+            }
+        }
+
+        [Test]
+        public void BoolEquals()
+        {
+            const int NumObjects = 10;
+            bool myFlag;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Query on a boolean field, match true.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Boolean
+                                               orderby t.Number descending
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(4, results.Length);
+                Assert.AreEqual(9, results[0].Number);
+                Assert.AreEqual(6, results[1].Number);
+                Assert.AreEqual(3, results[2].Number);
+                Assert.AreEqual(0, results[3].Number);
+
+                // Query on a boolean field, match false.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where !t.Boolean
+                        orderby t.Number
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                int pos = 0;
+                Assert.AreEqual(6, results.Length);
+                Assert.AreEqual(1, results[pos++].Number);
+                Assert.AreEqual(2, results[pos++].Number);
+                Assert.AreEqual(4, results[pos++].Number);
+                Assert.AreEqual(5, results[pos++].Number);
+                Assert.AreEqual(7, results[pos++].Number);
+                Assert.AreEqual(8, results[pos++].Number);
+
+                // Query on a boolean field, match a variable.
+                myFlag = true;
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Boolean == myFlag
+                        orderby t.Number descending
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(4, results.Length);
+                Assert.AreEqual(9, results[0].Number);
+                Assert.AreEqual(6, results[1].Number);
+                Assert.AreEqual(3, results[2].Number);
+                Assert.AreEqual(0, results[3].Number);
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void ComparisionOfTwoMembers()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query comparing two members, which is not supported.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where (int)t.Enum == t.Number
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.Fail("Must get an exception.");
+            }
+        }
+
+        [Test]
+        public void ComparisionOfTwoConstants()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query using a constant expression which evaluates to true, thus matching all.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where 1 != 2
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.AreEqual(NumObjects, results.Length);
+
+                // Try query using a constant expression which evaluates to false, thus matching none.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where 1 == 2
+                        orderby t.Number
+                        select t;
+                results = query.ToArray();
+                Assert.AreEqual(0, results.Length);
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void MemberMethodCall()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query using a constant expression which evaluates to true, thus matching all.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number.ToString() == "2"
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.Fail("Must get an exception.");
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void MemberArithmetic01()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query using a constant expression which evaluates to true, thus matching all.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number % 2 == 0
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.Fail("Must get an exception.");
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void MemberArithmetic02()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query using a constant expression which evaluates to true, thus matching all.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number + 2 == 4
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.Fail("Must get an exception.");
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void MemberArithmetic03()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try query using a constant expression which evaluates to true, thus matching all.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number + t.Long == 4
+                                               orderby t.Number
+                                               select t;
+                TestObject[] results = query.ToArray();
+                Assert.Fail("Must get an exception.");
             }
         }
 
@@ -379,6 +850,8 @@ namespace Lucene.Net.ObjectMapping.Tests
                     Float = 1.0101010101f * i,
                     Double = Math.PI * i,
                     Decimal = e * i,
+                    Enum = (MyEnum)(i % 4),
+                    Boolean = (i % 3 == 0),
                 };
 
                 writer.AddDocument(converter(obj));

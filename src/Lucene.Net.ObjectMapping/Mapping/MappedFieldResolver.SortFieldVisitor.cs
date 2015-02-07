@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Search;
+﻿using Lucene.Net.Linq;
+using Lucene.Net.Search;
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
@@ -54,12 +55,56 @@ namespace Lucene.Net.Mapping
             /// <returns>
             /// An instance of SortField which can be used to sort on the field from the given Expression.
             /// </returns>
-            public SortField GetSortField(Expression expression)
+            internal SortField GetSortField(Expression expression)
             {
                 Visit(expression);
                 Debug.Assert(null != sortField, "The resulting sort field must not be null.");
 
                 return sortField;
+            }
+
+            #region Protected Methods
+
+            /// <summary>
+            /// Visits the ConstantExpression.
+            /// </summary>
+            /// <param name="node">
+            /// The expression to visit.
+            /// </param>
+            /// <returns>
+            /// The modified expression, if it or any subexpression was modified; otherwise, returns the original expression.
+            /// </returns>
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                if (node.Type == typeof(GenericField))
+                {
+                    GenericField value = node.GetValue<GenericField>();
+
+                    switch (value)
+                    {
+                        case GenericField.ActualType:
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldActualType, SortField.STRING, sortDescending);
+                            break;
+
+                        case GenericField.StaticType:
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldStaticType, SortField.STRING, sortDescending);
+                            break;
+                        case GenericField.Source:
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldSource, SortField.STRING, sortDescending);
+                            break;
+                        case GenericField.Timestamp:
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldTimestamp, SortField.LONG, sortDescending);
+                            break;
+
+                        default:
+                            Debug.Fail("Unsupported GenericField: " + value);
+                            throw new NotSupportedException(String.Format("Unsupported GenericField: {0}.", value));
+                    }
+
+                    return node;
+                }
+
+                return base.VisitConstant(node);
             }
 
             /// <summary>
@@ -117,6 +162,8 @@ namespace Lucene.Net.Mapping
 
                 return node;
             }
+
+            #endregion
         }
     }
 }

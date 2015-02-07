@@ -35,7 +35,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Document doc = obj.ToDocument();
             Assert.NotNull(doc);
-            int remainingFields = 15 /* total fields */ - 1 /* null field */;
+            int remainingFields = 16 /* total fields */ - 1 /* null field */;
 
             foreach (IFieldable field in doc.GetFields())
             {
@@ -135,6 +135,12 @@ namespace Lucene.Net.ObjectMapping.Tests
                         Assert.True(field.IsTokenized);
                         Assert.True(field.IsIndexed);
                         Assert.AreEqual(obj.Byte.ToString(), field.StringValue);
+                        break;
+
+                    case "Enum":
+                        Assert.True(field.IsTokenized);
+                        Assert.True(field.IsIndexed);
+                        Assert.AreEqual(((int)obj.Enum).ToString(), field.StringValue);
                         break;
 
                     default:

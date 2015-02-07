@@ -23,11 +23,16 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An IQueryable of TElement.
         /// </returns>
-        public static IQueryable<TElement> Query<TElement>(this Searcher searcher)
+        public static IQueryable<TElement> AsQueryable<TElement>(this Searcher searcher)
         {
+            if (null == searcher)
+            {
+                throw new ArgumentNullException("searcher");
+            }
+
             MappingSettings settings = MappingSettings.Default;
 
-            return new LuceneQueryable<TElement>(settings.ObjectMapper.GetQueryProvider(searcher), new QueryContext());
+            return new LuceneQueryable<TElement>(settings.ObjectMapper.GetQueryProvider(searcher));
         }
 
         #region Plain Query, no Sort

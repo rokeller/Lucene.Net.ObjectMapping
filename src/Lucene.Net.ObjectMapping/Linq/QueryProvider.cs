@@ -43,13 +43,14 @@ namespace Lucene.Net.Linq
         /// The type of the elements of the IQueryable&lt;TElement&gt; that is returned.
         /// </typeparam>
         /// <param name="expression">
+        /// The Expression to create a query for.
         /// </param>
         /// <returns>
         /// An IQueryable&lt;TElement&gt; that can evaluate the query represented by the specified expression tree.
         /// </returns>
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new LuceneQueryable<TElement>(this, GetContext<TElement>(), expression);
+            return (IQueryable<TElement>)Bind(expression);
         }
 
         /// <summary>
@@ -63,20 +64,7 @@ namespace Lucene.Net.Linq
         /// </returns>
         public IQueryable CreateQuery(Expression expression)
         {
-            Type elementType = expression.Type.GetEnumerableElementType();
-
-            try
-            {
-                Type queryableType = typeof(LuceneQueryable<>).MakeGenericType(elementType);
-
-                return (IQueryable)Activator.CreateInstance(
-                    queryableType,
-                    new object[] { this, GetContext(queryableType), expression });
-            }
-            catch (TargetInvocationException ex)
-            {
-                throw ex.InnerException;
-            }
+            return (IQueryable)Bind(expression);
         }
 
         /// <summary>
@@ -136,32 +124,24 @@ namespace Lucene.Net.Linq
         #region Private Methods
 
         /// <summary>
-        /// Gets the QueryContext from the current LuceneQueryable linked with this instance.
+        /// Binds the given Expression and creates a new query for it.
         /// </summary>
-        /// <typeparam name="T">
-        /// The element type that the LuceneQueryable handles.
-        /// </typeparam>
-        /// <returns>
-        /// The QueryContext from the current LuceneQueryable linked with this instance.
-        /// </returns>
-        private QueryContext GetContext<T>()
-        {
-            LuceneQueryable<T> queryable = (LuceneQueryable<T>)Queryable;
-            return queryable.Context;
-        }
-
-        /// <summary>
-        /// Gets the QueryContext from the current LuceneQueryable linked with this instance.
-        /// </summary>
-        /// <param name="queryableType">
-        /// The element type that the LuceneQueryable handles.
+        /// <param name="expression">
+        /// The Expression to bind.
         /// </param>
         /// <returns>
-        /// The QueryContext from the current LuceneQueryable linked with this instance.
+        /// An instance of IQueryable.
         /// </returns>
-        private QueryContext GetContext(Type queryableType)
+        private IQueryable Bind(Expression expression)
         {
-            return (QueryContext)queryableType.GetProperty("Context").GetValue(Queryable, null);
+            Type enumerableType = Queryable.GetType().GetEnumerableElementType();
+            Type binderType = typeof(LuceneQueryBinder<>).MakeGenericType(enumerableType);
+
+            LuceneQueryBinder binder = (LuceneQueryBinder)Activator.CreateInstance(
+                binderType,
+                FieldNameResolver);
+
+            return binder.Bind(expression);
         }
 
         /// <summary>
@@ -176,15 +156,11 @@ namespace Lucene.Net.Linq
         private object ExecuteQueryWorker(Expression expression)
         {
             Type enumerableType = Queryable.GetType().GetEnumerableElementType();
-            Type parserType = typeof(LuceneQueryParser<>).MakeGenericType(enumerableType);
+            Type executorType = typeof(LuceneQueryExecutor<>).MakeGenericType(enumerableType);
 
-            LuceneQueryParser parser = (LuceneQueryParser)Activator.CreateInstance(
-                parserType,
-                Queryable,
-                Searcher,
-                FieldNameResolver);
+            LuceneQueryExecutor executor = (LuceneQueryExecutor)Activator.CreateInstance(executorType, Searcher);
 
-            return parser.ParseAndExecute(expression);
+            return executor.Execute(expression);
         }
 
         #endregion

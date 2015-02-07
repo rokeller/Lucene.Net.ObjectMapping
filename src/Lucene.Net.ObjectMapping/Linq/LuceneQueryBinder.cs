@@ -11,9 +11,18 @@ namespace Lucene.Net.Linq
     /// <summary>
     /// The base class for a generically typed query parser for LINQ queries in Lucene.Net.
     /// </summary>
-    internal abstract class LuceneQueryParser : ExpressionVisitor
+    internal abstract class LuceneQueryBinder : ExpressionVisitor
     {
-        public abstract object ParseAndExecute(Expression expression);
+        /// <summary>
+        /// Binds the given Expression and returns a new IQueryable.
+        /// </summary>
+        /// <param name="expression">
+        /// The Expression to bind.
+        /// </param>
+        /// <returns>
+        /// An instance of IQueryable.
+        /// </returns>
+        public abstract IQueryable Bind(Expression expression);
     }
 
     /// <summary>
@@ -22,7 +31,7 @@ namespace Lucene.Net.Linq
     /// <typeparam name="T">
     /// The type of the elements returned with queries parsed with this parser.
     /// </typeparam>
-    internal sealed class LuceneQueryParser<T> : LuceneQueryParser
+    internal sealed class LuceneQueryBinder<T> : LuceneQueryBinder
     {
         #region Fields
 
@@ -34,7 +43,7 @@ namespace Lucene.Net.Linq
         /// <summary>
         /// The LuceneQueryable of T this parser is used with.
         /// </summary>
-        private readonly LuceneQueryable<T> queryable;
+        private LuceneQueryable<T> queryable;
 
         #endregion
 
@@ -43,34 +52,17 @@ namespace Lucene.Net.Linq
         /// <summary>
         /// Initializes a new instance of LuceneQueryParser.
         /// </summary>
-        /// <param name="queryable">
-        /// The LuceneQueryable of T this parser is used with.
-        /// </param>
-        /// <param name="searcher">
-        /// The Searcher to use for the search.
-        /// </param>
         /// <param name="resolver">
         /// The MappedFieldResolver to use.
         /// </param>
-        public LuceneQueryParser(LuceneQueryable<T> queryable, Searcher searcher, MappedFieldResolver resolver)
+        public LuceneQueryBinder(MappedFieldResolver resolver)
         {
-            if (null == queryable)
-            {
-                throw new ArgumentNullException("queryable");
-            }
-            else if (null == searcher)
-            {
-                throw new ArgumentNullException("searcher");
-            }
-            else if (null == resolver)
+            if (null == resolver)
             {
                 throw new ArgumentNullException("resolver");
             }
 
-            this.queryable = queryable;
             this.resolver = resolver;
-
-            queryable.Searcher = searcher;
         }
 
         #endregion
@@ -78,31 +70,19 @@ namespace Lucene.Net.Linq
         #region Public Methods
 
         /// <summary>
-        /// Parses and then executes the query from the given Expression.
+        /// Binds the given Expression and returns a LuceneQueryable of T.
         /// </summary>
         /// <param name="expression">
-        /// The Expression with the query.
+        /// The Expression to bind.
         /// </param>
         /// <returns>
-        /// An object that represents the result of the query.
+        /// An instance of LuceneQueryable of T.
         /// </returns>
-        public override object ParseAndExecute(Expression expression)
+        public override IQueryable Bind(Expression expression)
         {
-            Expression result = Visit(expression);
-            ConstantExpression constant = result as ConstantExpression;
-            LambdaExpression lambda = result as LambdaExpression;
+            Visit(expression);
 
-            if (null != constant && constant.Type == typeof(LuceneQueryable<T>))
-            {
-                Debug.Assert(queryable == constant.Value, "The current queryable must the equal to the constant.");
-                return queryable.Enumerate();
-            }
-            else if (null != lambda)
-            {
-                return lambda.Compile().DynamicInvoke();
-            }
-
-            throw new NotSupportedException("The expression is not supported: " + expression);
+            return queryable;
         }
 
         #endregion
@@ -122,13 +102,7 @@ namespace Lucene.Net.Linq
         {
             if (node.Method.DeclaringType == typeof(Queryable))
             {
-                if (node.Method.Name == "Count")
-                {
-                    Visit(node.Arguments[0]);
-
-                    return queryable.CountExpression;
-                }
-                else if (node.Method.Name == "Skip" && node.Arguments[1].Type == typeof(int))
+                if (node.Method.Name == "Skip" && node.Arguments[1].Type == typeof(int))
                 {
                     Visit(node.Arguments[0]);
                     queryable.Context.Skip = node.Arguments[1].GetValue<int>();
@@ -142,7 +116,7 @@ namespace Lucene.Net.Linq
 
                     return Expression.Constant(queryable);
                 }
-                else if (node.Method.Name == "Where")
+                else if (node.Method.Name == "Where" && node.Arguments[1].Type == typeof(Expression<Func<T, bool>>))
                 {
                     Visit(node.Arguments[0]);
                     queryable.Context.Query = resolver.GetQuery(node.Arguments[1]);
@@ -205,22 +179,14 @@ namespace Lucene.Net.Linq
         /// </returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            IQueryable queryable = node.Value as IQueryable;
+            LuceneQueryable<T> queryable = node.Value as LuceneQueryable<T>;
 
             if (null != queryable)
             {
-                Type type = queryable.GetType();
+                Debug.Assert(null == this.queryable, "The queryable must not have been set yet.");
+                this.queryable = new LuceneQueryable<T>(queryable.QueryProvider, QueryContext.Clone(queryable.Context));
 
-                if (type.IsGenericType)
-                {
-                    Type genericType = type.GetGenericTypeDefinition();
-
-                    if (typeof(LuceneQueryable<>) == genericType ||
-                        genericType.IsSubclassOf(typeof(LuceneQueryable<>)))
-                    {
-                        return node;
-                    }
-                }
+                return node;
             }
 
             return base.VisitConstant(node);

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Lucene.Net.Linq;
+using System;
+using System.Linq.Expressions;
 
 namespace Lucene.Net.Mapping
 {
     /// <summary>
     /// Represents a mapped field.
     /// </summary>
-    public sealed class MappedField
+    public class MappedField
     {
         /// <summary>
         /// Initializes a new instance of MappedField.
@@ -44,6 +46,23 @@ namespace Lucene.Net.Mapping
         /// Gets or sets the FieldType of the mapped field.
         /// </summary>
         public FieldType Type { get; private set; }
+
+        /// <summary>
+        /// Gets the value of type T from the given expression.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the value to get.
+        /// </typeparam>
+        /// <param name="expression">
+        /// The expression to get the value from.
+        /// </param>
+        /// <returns>
+        /// An object of type T.
+        /// </returns>
+        public virtual T GetValueFromExpression<T>(Expression expression)
+        {
+            return expression.GetValue<T>();
+        }
 
         /// <summary>
         /// Defines the types a mapped field can have.
