@@ -158,7 +158,9 @@ namespace Lucene.Net.Linq
             Type enumerableType = Queryable.GetType().GetEnumerableElementType();
             Type executorType = typeof(LuceneQueryExecutor<>).MakeGenericType(enumerableType);
 
-            LuceneQueryExecutor executor = (LuceneQueryExecutor)Activator.CreateInstance(executorType, Searcher);
+            LuceneQueryExecutor executor = (LuceneQueryExecutor)Activator.CreateInstance(executorType,
+                Searcher,
+                FieldNameResolver);
 
             return executor.Execute(expression);
         }

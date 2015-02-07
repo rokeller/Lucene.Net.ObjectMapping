@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Mapping;
 using Lucene.Net.Search;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,11 @@ namespace Lucene.Net.Linq
         /// </summary>
         private readonly Searcher searcher;
 
+        /// <summary>
+        /// The MappedFieldResolver to use.
+        /// </summary>
+        private readonly MappedFieldResolver resolver;
+
         #endregion
 
         #region C'tors
@@ -50,14 +56,22 @@ namespace Lucene.Net.Linq
         /// <param name="searcher">
         /// The Searcher to use for the search.
         /// </param>
-        public LuceneQueryExecutor(Searcher searcher)
+        /// <param name="resolver">
+        /// The MappedFieldResolver to use.
+        /// </param>
+        public LuceneQueryExecutor(Searcher searcher, MappedFieldResolver resolver)
         {
             if (null == searcher)
             {
                 throw new ArgumentNullException("searcher");
             }
+            else if (null == resolver)
+            {
+                throw new ArgumentNullException("resolver");
+            }
 
             this.searcher = searcher;
+            this.resolver = resolver;
         }
 
         #endregion
@@ -78,12 +92,19 @@ namespace Lucene.Net.Linq
             Expression result = Visit(expression);
             ConstantExpression constant = result as ConstantExpression;
             LambdaExpression lambda = result as LambdaExpression;
+            Expression<Func<T>> genericLambda = result as Expression<Func<T>>;
 
             if (null != constant && constant.Type == typeof(LuceneQueryable<T>))
             {
                 LuceneQueryable<T> queryable = (LuceneQueryable<T>)constant.Value;
 
                 return Enumerate(queryable.Context);
+            }
+            else if (null != genericLambda)
+            {
+                Func<T> func = genericLambda.Compile();
+
+                return func();
             }
             else if (null != lambda)
             {
@@ -119,7 +140,86 @@ namespace Lucene.Net.Linq
 
                     return GetCountExpression(queryable.Context);
                 }
+                else if (node.Method.Name == "First")
+                {
+                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
+                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
 
+                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
+
+                    switch (node.Arguments.Count)
+                    {
+                        case 1:
+                            return GetFirstExpression(queryable.Context);
+
+                        case 2:
+                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
+                            return GetFirstExpression(queryable.Context);
+
+                        default:
+                            break;
+                    }
+                }
+                else if (node.Method.Name == "FirstOrDefault")
+                {
+                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
+                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
+
+                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
+
+                    switch (node.Arguments.Count)
+                    {
+                        case 1:
+                            return GetFirstOrDefaultExpression(queryable.Context);
+
+                        case 2:
+                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
+                            return GetFirstOrDefaultExpression(queryable.Context);
+
+                        default:
+                            break;
+                    }
+                }
+                else if (node.Method.Name == "Single")
+                {
+                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
+                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
+
+                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
+
+                    switch (node.Arguments.Count)
+                    {
+                        case 1:
+                            return GetSingleExpression(queryable.Context);
+
+                        case 2:
+                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
+                            return GetSingleExpression(queryable.Context);
+
+                        default:
+                            break;
+                    }
+                }
+                else if (node.Method.Name == "SingleOrDefault")
+                {
+                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
+                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
+
+                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
+
+                    switch (node.Arguments.Count)
+                    {
+                        case 1:
+                            return GetSingleOrDefaultExpression(queryable.Context);
+
+                        case 2:
+                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
+                            return GetSingleOrDefaultExpression(queryable.Context);
+
+                        default:
+                            break;
+                    }
+                }
             }
 
             throw new NotSupportedException("The Method is not supported: " + node.Method.Name);
@@ -128,6 +228,33 @@ namespace Lucene.Net.Linq
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Gets a filtered queryable for the given predicate.
+        /// </summary>
+        /// <param name="queryable">
+        /// The LuceneQueryable of T to filter on.
+        /// </param>
+        /// <param name="typeArguments">
+        /// The type arguments for the Where method call.
+        /// </param>
+        /// <param name="predicate">
+        /// The Expression which defines the predicate.
+        /// </param>
+        /// <returns>
+        /// A new instance of LuceneQueryable<T>.
+        /// </returns>
+        private LuceneQueryable<T> GetFilteredQueryable(LuceneQueryable<T> queryable, Type[] typeArguments, Expression predicate)
+        {
+            LuceneQueryBinder<T> binder = new LuceneQueryBinder<T>(resolver);
+            Expression where = Expression.Call(typeof(Queryable),
+                                               "Where",
+                                               typeArguments,
+                                               Expression.Constant(queryable),
+                                               predicate);
+
+            return (LuceneQueryable<T>)binder.Bind(where);
+        }
 
         /// <summary>
         /// Enumerates the results of this query.
@@ -155,57 +282,6 @@ namespace Lucene.Net.Linq
         }
 
         /// <summary>
-        /// Gets the Count of the results of this query.
-        /// </summary>
-        /// <param name="context">
-        /// The QueryContext for the search.
-        /// </param>
-        /// <returns>
-        /// The number of results found with this query.
-        /// </returns>
-        private int Count(QueryContext context)
-        {
-            try
-            {
-                TopFieldCollector collector = TopFieldCollector.Create(
-                    context.Sort,
-                    1,
-                    false,
-                    false,
-                    false,
-                    false);
-
-                searcher.Search<T>(context.Query, collector);
-
-                if (context.Take.HasValue)
-                {
-                    if (context.Skip.HasValue)
-                    {
-                        int docCount = collector.TotalHits - context.Skip.Value;
-
-                        return Math.Max(0, Math.Min(context.Take.Value, docCount));
-                    }
-                    else
-                    {
-                        return Math.Min(context.Take.Value, collector.TotalHits);
-                    }
-                }
-                else if (context.Skip.HasValue)
-                {
-                    // Take doesn't have a value here.
-                    return Math.Max(0, collector.TotalHits - context.Skip.Value);
-                }
-
-                return collector.TotalHits;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Gets an Expression for a function which returns the count of the results in this query.
         /// </summary>
         /// <param name="context">
@@ -217,6 +293,217 @@ namespace Lucene.Net.Linq
         private Expression<Func<int>> GetCountExpression(QueryContext context)
         {
             return () => Count(context);
+        }
+
+        /// <summary>
+        /// Gets an Expression for a function which returns the first match from a query.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// A Lambda expression.
+        /// </returns>
+        private Expression<Func<T>> GetFirstExpression(QueryContext context)
+        {
+            return () => First(context);
+        }
+
+        /// <summary>
+        /// Gets an Expression for a function which returns the first match or a default from a query.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// A Lambda expression.
+        /// </returns>
+        private Expression<Func<T>> GetFirstOrDefaultExpression(QueryContext context)
+        {
+            return () => FirstOrDefault(context);
+        }
+
+        /// <summary>
+        /// Gets an Expression for a function which returns the single match from a query.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// A Lambda expression.
+        /// </returns>
+        private Expression<Func<T>> GetSingleExpression(QueryContext context)
+        {
+            return () => Single(context);
+        }
+
+        /// <summary>
+        /// Gets an Expression for a function which returns the single match or the default from a query.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// A Lambda expression.
+        /// </returns>
+        private Expression<Func<T>> GetSingleOrDefaultExpression(QueryContext context)
+        {
+            return () => SingleOrDefault(context);
+        }
+
+        /// <summary>
+        /// Gets the Count of the results of this query.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// The number of results found with this query.
+        /// </returns>
+        private int Count(QueryContext context)
+        {
+            TopFieldCollector collector = TopFieldCollector.Create(
+                context.Sort,
+                1,
+                false,
+                false,
+                false,
+                false);
+
+            searcher.Search<T>(context.Query, collector);
+
+            if (context.Take.HasValue)
+            {
+                if (context.Skip.HasValue)
+                {
+                    int docCount = collector.TotalHits - context.Skip.Value;
+
+                    return Math.Max(0, Math.Min(context.Take.Value, docCount));
+                }
+                else
+                {
+                    return Math.Min(context.Take.Value, collector.TotalHits);
+                }
+            }
+            else if (context.Skip.HasValue)
+            {
+                // Take doesn't have a value here.
+                return Math.Max(0, collector.TotalHits - context.Skip.Value);
+            }
+
+            return collector.TotalHits;
+        }
+
+        /// <summary>
+        /// Gets the first matching item from the query. Throws an exception if there no items in the results.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// An instance of T.
+        /// </returns>
+        private T First(QueryContext context)
+        {
+            T result = FirstOrDefault(context);
+
+            if (null == result)
+            {
+                throw new InvalidOperationException("The query has no results.");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the first matching item from the query or a default.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// An instance of T, or default(T) if no items are found.
+        /// </returns>
+        private T FirstOrDefault(QueryContext context)
+        {
+            TopFieldCollector collector = TopFieldCollector.Create(
+                context.Sort,
+                1,
+                false,
+                false,
+                false,
+                false);
+
+            searcher.Search<T>(context.Query, collector);
+
+            if (collector.TotalHits < 1)
+            {
+                return default(T);
+            }
+
+            ScoreDoc[] scoreDocs = collector.TopDocs().ScoreDocs;
+            Document doc = searcher.Doc(scoreDocs[0].Doc);
+
+            return doc.ToObject<T>();
+        }
+
+        /// <summary>
+        /// Gets the single matching item from the query. Throws an exception if there is not exactly one item in the
+        /// results.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// An instance of T.
+        /// </returns>
+        private T Single(QueryContext context)
+        {
+            T result = SingleOrDefault(context);
+
+            if (null == result)
+            {
+                throw new InvalidOperationException("The query has no results.");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the single matching item from the query or a default. Throws an exception if there are more than one items in the
+        /// results.
+        /// </summary>
+        /// <param name="context">
+        /// The QueryContext for the search.
+        /// </param>
+        /// <returns>
+        /// An instance of T, or default(T) if no items are found.
+        /// </returns>
+        private T SingleOrDefault(QueryContext context)
+        {
+            TopFieldCollector collector = TopFieldCollector.Create(
+                context.Sort,
+                1,
+                false,
+                false,
+                false,
+                false);
+
+            searcher.Search<T>(context.Query, collector);
+
+            if (collector.TotalHits > 1)
+            {
+                throw new InvalidOperationException("The query has more than one result.");
+            }
+            else if (collector.TotalHits < 1)
+            {
+                return default(T);
+            }
+
+            ScoreDoc[] scoreDocs = collector.TopDocs().ScoreDocs;
+            Document doc = searcher.Doc(scoreDocs[0].Doc);
+
+            return doc.ToObject<T>();
         }
 
         /// <summary>

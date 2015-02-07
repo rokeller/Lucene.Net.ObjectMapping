@@ -821,6 +821,324 @@ namespace Lucene.Net.ObjectMapping.Tests
             }
         }
 
+        #region First and FirstOrDefault
+
+        [Test]
+        public void First()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try First() for a single existing item.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number == 9
+                                               select t;
+
+                TestObject result = query.First();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(9, result.Number);
+
+                // Try First() for a non-existing item.
+                try
+                {
+                    query = from t in searcher.AsQueryable<TestObject>()
+                            where t.Number == 9999
+                            select t;
+
+                    result = query.First();
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has no results.", ex.Message);
+                }
+
+                // Try First() for multiple existing items.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Number.InRange(3, null, false, true)
+                        select t;
+
+                result = query.First();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(4, result.Number);
+            }
+        }
+
+        [Test]
+        public void FirstWithPredicate()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try First() for a single existing item.
+                TestObject result = searcher.AsQueryable<TestObject>().First(t => t.Number == 0);
+                Assert.IsNotNull(result);
+                Assert.AreEqual(0, result.Number);
+
+                // Try First() for a non-existing item.
+                try
+                {
+                    result = searcher.AsQueryable<TestObject>().First(t => t.Number == 9999);
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has no results.", ex.Message);
+                }
+
+                // Try First() for multiple existing items.
+                result = searcher.AsQueryable<TestObject>().First(t => t.String == "foo" || t.Number.InRange(5, 8, true, true));
+                Assert.IsNotNull(result);
+                Assert.GreaterOrEqual(result.Number, 5);
+                Assert.LessOrEqual(result.Number, 8);
+            }
+        }
+
+        [Test]
+        public void FirstOrDefault()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try FirstOrDefault() for a single existing item.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number == 8
+                                               select t;
+
+                TestObject result = query.FirstOrDefault();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(8, result.Number);
+
+                // Try FirstOrDefault() for a non-existing item.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Number == 9999
+                        select t;
+
+                result = query.FirstOrDefault();
+                Assert.IsNull(result);
+
+                // Try FirstOrDefault() for multiple existing items.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Number.InRange(null, 7, false, true)
+                        orderby t.Number descending
+                        select t;
+
+                result = query.FirstOrDefault();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(7, result.Number);
+            }
+        }
+
+        [Test]
+        public void FirstOrDefaultWithPredicate()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try FirstOrDefault() for a single existing item.
+                TestObject result = searcher.AsQueryable<TestObject>().FirstOrDefault(t => t.Number == 0);
+                Assert.IsNotNull(result);
+                Assert.AreEqual(0, result.Number);
+
+                // Try FirstOrDefault() for a non-existing item.
+                result = searcher.AsQueryable<TestObject>().FirstOrDefault(t => t.Number == 9999);
+                Assert.IsNull(result);
+
+                // Try FirstOrDefault() for multiple existing items.
+                result = searcher.AsQueryable<TestObject>().FirstOrDefault(t => t.String == "test" && t.Number.InRange(2, null, true, false));
+                Assert.IsNotNull(result);
+                Assert.AreEqual(2, result.Number);
+            }
+        }
+
+        #endregion
+
+        #region Single and SingleOrDefault
+
+        [Test]
+        public void Single()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try Single() for a single existing item.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number == 9
+                                               select t;
+
+                TestObject result = query.Single();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(9, result.Number);
+
+                // Try Single() for a non-existing item.
+                try
+                {
+                    query = from t in searcher.AsQueryable<TestObject>()
+                            where t.Number == 9999
+                            select t;
+
+                    result = query.Single();
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has no results.", ex.Message);
+                }
+
+                // Try Single() for multiple existing items.
+                try
+                {
+                    query = from t in searcher.AsQueryable<TestObject>()
+                            where t.Boolean
+                            select t;
+
+                    result = query.Single();
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has more than one result.", ex.Message);
+                }
+            }
+        }
+
+        [Test]
+        public void SingleWithPredicate()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try Single() for a single existing item.
+                TestObject result = searcher.AsQueryable<TestObject>().Single(t => t.Number == 0);
+                Assert.IsNotNull(result);
+                Assert.AreEqual(0, result.Number);
+
+                // Try Single() for a non-existing item.
+                try
+                {
+                    result = searcher.AsQueryable<TestObject>().Single(t => t.Number == 9999);
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has no results.", ex.Message);
+                }
+
+                // Try Single() for multiple existing items.
+                try
+                {
+                    result = searcher.AsQueryable<TestObject>().Single(t => !t.Boolean);
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has more than one result.", ex.Message);
+                }
+            }
+        }
+
+        [Test]
+        public void SingleOrDefault()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try SingleOrDefault() for a single existing item.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.Number == 9
+                                               select t;
+
+                TestObject result = query.SingleOrDefault();
+                Assert.IsNotNull(result);
+                Assert.AreEqual(9, result.Number);
+
+                // Try SingleOrDefault() for a non-existing item.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.Number == 9999
+                        select t;
+
+                result = query.SingleOrDefault();
+                Assert.IsNull(result);
+
+                // Try SingleOrDefault() for multiple existing items.
+                try
+                {
+                    query = from t in searcher.AsQueryable<TestObject>()
+                            where t.Boolean
+                            select t;
+
+                    result = query.SingleOrDefault();
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has more than one result.", ex.Message);
+                }
+            }
+        }
+
+        [Test]
+        public void SingleOrDefaultWithPredicate()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                // Try SingleOrDefault() for a single existing item.
+                TestObject result = searcher.AsQueryable<TestObject>().SingleOrDefault(t => t.Number == 0);
+                Assert.IsNotNull(result);
+                Assert.AreEqual(0, result.Number);
+
+                // Try SingleOrDefault() for a non-existing item.
+                result = searcher.AsQueryable<TestObject>().SingleOrDefault(t => t.Number == 9999);
+                Assert.IsNull(result);
+
+                // Try SingleOrDefault() for multiple existing items.
+                try
+                {
+                    result = searcher.AsQueryable<TestObject>().SingleOrDefault(t => !t.Boolean);
+                    Assert.Fail("Must get an exception.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Assert.AreEqual("The query has more than one result.", ex.Message);
+                }
+            }
+        }
+
+        #endregion
+
         [SetUp]
         public void SetUp()
         {
