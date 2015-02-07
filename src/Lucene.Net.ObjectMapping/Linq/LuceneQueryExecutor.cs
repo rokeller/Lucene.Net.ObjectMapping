@@ -242,7 +242,7 @@ namespace Lucene.Net.Linq
         /// The Expression which defines the predicate.
         /// </param>
         /// <returns>
-        /// A new instance of LuceneQueryable<T>.
+        /// A new instance of LuceneQueryable of T.
         /// </returns>
         private LuceneQueryable<T> GetFilteredQueryable(LuceneQueryable<T> queryable, Type[] typeArguments, Expression predicate)
         {
