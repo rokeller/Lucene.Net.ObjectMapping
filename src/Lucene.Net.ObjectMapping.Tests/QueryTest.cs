@@ -20,7 +20,49 @@ namespace Lucene.Net.ObjectMapping.Tests
         private IndexWriter writer;
 
         [Test]
-        public void QueryWithCount()
+        public void Any()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
+                IQueryable<NestedTestObjectA> queryA = searcher.AsQueryable<NestedTestObjectA>();
+
+                Assert.IsTrue(query.Any());
+                Assert.IsTrue(query.Where(t => t.String == "test").Any());
+                Assert.IsFalse(query.Where(t => t.String != "test").Any());
+
+                Assert.IsFalse(queryA.Any());
+            }
+        }
+
+        [Test]
+        public void AnyWithPredicate()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
+                IQueryable<NestedTestObjectA> queryA = searcher.AsQueryable<NestedTestObjectA>();
+
+                Assert.IsTrue(query.Any(t => t.String == "test"));
+                Assert.IsFalse(query.Any(t => t.String != "test"));
+                Assert.IsTrue(query.Any());
+
+                Assert.IsFalse(queryA.Any());
+            }
+        }
+
+        [Test]
+        public void Count()
         {
             const int NumObjects = 10;
             const int MaxNumberExclusive = 5;
@@ -47,6 +89,32 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 Assert.AreEqual(MaxNumberExclusive, query.Count());
                 Assert.AreEqual(MaxNumberExclusive, orderedQuery.Count());
+            }
+        }
+
+        [Test]
+        public void CountWithPredicate()
+        {
+            const int NumObjects = 10;
+            const int MaxNumberExclusive = 5;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            WriteC(NumObjects, obj => obj.ToDocument());
+
+            Assert.AreEqual(2 * NumObjects, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir, true))
+            {
+                IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
+                IOrderedQueryable<TestObject> orderedQuery = query
+                    .OrderByDescending(t => t.Number).ThenBy(t => t.Long);
+
+                Assert.AreEqual(MaxNumberExclusive, query.Count(t => t.Number.InRange(null, MaxNumberExclusive, false, false)));
+                Assert.AreEqual(MaxNumberExclusive, orderedQuery.Count(t => t.Number.InRange(MaxNumberExclusive, null, true, false)));
+
+                // Now let's verify that the original query weren't modified, and still return the full number of results.
+                Assert.AreEqual(NumObjects, query.Count());
+                Assert.AreEqual(NumObjects, orderedQuery.Count());
             }
         }
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Lucene.Net.Linq
 {
@@ -131,94 +132,18 @@ namespace Lucene.Net.Linq
         {
             if (node.Method.DeclaringType == typeof(Queryable))
             {
-                if (node.Method.Name == "Count" && node.Arguments.Count == 1)
+                if (node.Method.Name == "Any")
                 {
-                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
-                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
-
-                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
-
-                    return GetCountExpression(queryable.Context);
+                    return GetExpressionForFilterableCall<Func<bool>>(node);
                 }
-                else if (node.Method.Name == "First")
+                else if (node.Method.Name == "Count")
                 {
-                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
-                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
-
-                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
-
-                    switch (node.Arguments.Count)
-                    {
-                        case 1:
-                            return GetFirstExpression(queryable.Context);
-
-                        case 2:
-                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
-                            return GetFirstExpression(queryable.Context);
-
-                        default:
-                            break;
-                    }
+                    return GetExpressionForFilterableCall<Func<int>>(node);
                 }
-                else if (node.Method.Name == "FirstOrDefault")
+                else if (node.Method.Name == "First" || node.Method.Name == "FirstOrDefault" ||
+                         node.Method.Name == "Single" || node.Method.Name == "SingleOrDefault")
                 {
-                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
-                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
-
-                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
-
-                    switch (node.Arguments.Count)
-                    {
-                        case 1:
-                            return GetFirstOrDefaultExpression(queryable.Context);
-
-                        case 2:
-                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
-                            return GetFirstOrDefaultExpression(queryable.Context);
-
-                        default:
-                            break;
-                    }
-                }
-                else if (node.Method.Name == "Single")
-                {
-                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
-                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
-
-                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
-
-                    switch (node.Arguments.Count)
-                    {
-                        case 1:
-                            return GetSingleExpression(queryable.Context);
-
-                        case 2:
-                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
-                            return GetSingleExpression(queryable.Context);
-
-                        default:
-                            break;
-                    }
-                }
-                else if (node.Method.Name == "SingleOrDefault")
-                {
-                    Debug.Assert(node.Arguments[0].Type == typeof(LuceneQueryable<T>));
-                    Debug.Assert(node.Arguments[0].NodeType == ExpressionType.Constant);
-
-                    LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)node.Arguments[0]).Value;
-
-                    switch (node.Arguments.Count)
-                    {
-                        case 1:
-                            return GetSingleOrDefaultExpression(queryable.Context);
-
-                        case 2:
-                            queryable = GetFilteredQueryable(queryable, node.Method.GetGenericArguments(), node.Arguments[1]);
-                            return GetSingleOrDefaultExpression(queryable.Context);
-
-                        default:
-                            break;
-                    }
+                    return GetExpressionForFilterableCall<Func<T>>(node);
                 }
             }
 
@@ -228,6 +153,50 @@ namespace Lucene.Net.Linq
         #endregion
 
         #region Private Methods
+
+        /// <summary>
+        /// Creates a lambda expression for the method call described by the given expression.
+        /// </summary>
+        /// <typeparam name="TDelegate">
+        /// The Type of delegate to produce the lambda expression for.
+        /// </typeparam>
+        /// <param name="expression">
+        /// The original expression.
+        /// </param>
+        /// <returns>
+        /// An Expression of TDelegate.
+        /// </returns>
+        private Expression<TDelegate> GetExpressionForFilterableCall<TDelegate>(MethodCallExpression expression)
+        {
+            Debug.Assert(expression.Arguments[0].Type == typeof(LuceneQueryable<T>));
+            Debug.Assert(expression.Arguments[0].NodeType == ExpressionType.Constant);
+
+            LuceneQueryable<T> queryable = (LuceneQueryable<T>)((ConstantExpression)expression.Arguments[0]).Value;
+            MethodInfo method = typeof(LuceneQueryExecutor<T>).GetMethod(expression.Method.Name,
+                                                                         BindingFlags.Instance | BindingFlags.NonPublic);
+            Debug.Assert(null != method, "The method info must not be null.");
+
+            switch (expression.Arguments.Count)
+            {
+                case 1:
+                    // We can work with the queryable the method is called on.
+                    break;
+
+                case 2:
+                    // We need to apply the filter predicate from the method call on the original queryable.
+                    queryable = Filter(queryable, expression.Method.GetGenericArguments(), expression.Arguments[1]);
+                    break;
+
+                default:
+                    throw new NotSupportedException("The Method is not supported: " + expression.Method.Name);
+            }
+
+            // Now construct the lambda's body, as 'call this.<method>(queryable.Context)'.
+            Expression body = Expression.Call(Expression.Constant(this), method, Expression.Constant(queryable.Context));
+            Expression<TDelegate> lambda = Expression.Lambda<TDelegate>(body);
+
+            return lambda;
+        }
 
         /// <summary>
         /// Gets a filtered queryable for the given predicate.
@@ -244,7 +213,7 @@ namespace Lucene.Net.Linq
         /// <returns>
         /// A new instance of LuceneQueryable of T.
         /// </returns>
-        private LuceneQueryable<T> GetFilteredQueryable(LuceneQueryable<T> queryable, Type[] typeArguments, Expression predicate)
+        private LuceneQueryable<T> Filter(LuceneQueryable<T> queryable, Type[] typeArguments, Expression predicate)
         {
             LuceneQueryBinder<T> binder = new LuceneQueryBinder<T>(resolver);
             Expression where = Expression.Call(typeof(Queryable),
@@ -282,73 +251,27 @@ namespace Lucene.Net.Linq
         }
 
         /// <summary>
-        /// Gets an Expression for a function which returns the count of the results in this query.
+        /// Checks if the query from the given context yields any results.
         /// </summary>
         /// <param name="context">
         /// The QueryContext for the search.
         /// </param>
         /// <returns>
-        /// A Lambda expression.
+        /// True if the query has any results, false otherwise.
         /// </returns>
-        private Expression<Func<int>> GetCountExpression(QueryContext context)
+        private bool Any(QueryContext context)
         {
-            return () => Count(context);
-        }
+            TopFieldCollector collector = TopFieldCollector.Create(
+                context.Sort,
+                1,
+                false,
+                false,
+                false,
+                false);
 
-        /// <summary>
-        /// Gets an Expression for a function which returns the first match from a query.
-        /// </summary>
-        /// <param name="context">
-        /// The QueryContext for the search.
-        /// </param>
-        /// <returns>
-        /// A Lambda expression.
-        /// </returns>
-        private Expression<Func<T>> GetFirstExpression(QueryContext context)
-        {
-            return () => First(context);
-        }
+            searcher.Search<T>(context.Query, collector);
 
-        /// <summary>
-        /// Gets an Expression for a function which returns the first match or a default from a query.
-        /// </summary>
-        /// <param name="context">
-        /// The QueryContext for the search.
-        /// </param>
-        /// <returns>
-        /// A Lambda expression.
-        /// </returns>
-        private Expression<Func<T>> GetFirstOrDefaultExpression(QueryContext context)
-        {
-            return () => FirstOrDefault(context);
-        }
-
-        /// <summary>
-        /// Gets an Expression for a function which returns the single match from a query.
-        /// </summary>
-        /// <param name="context">
-        /// The QueryContext for the search.
-        /// </param>
-        /// <returns>
-        /// A Lambda expression.
-        /// </returns>
-        private Expression<Func<T>> GetSingleExpression(QueryContext context)
-        {
-            return () => Single(context);
-        }
-
-        /// <summary>
-        /// Gets an Expression for a function which returns the single match or the default from a query.
-        /// </summary>
-        /// <param name="context">
-        /// The QueryContext for the search.
-        /// </param>
-        /// <returns>
-        /// A Lambda expression.
-        /// </returns>
-        private Expression<Func<T>> GetSingleOrDefaultExpression(QueryContext context)
-        {
-            return () => SingleOrDefault(context);
+            return collector.TotalHits > 0;
         }
 
         /// <summary>
