@@ -29,6 +29,35 @@ namespace Lucene.Net.Mapping
         }
 
         /// <summary>
+        /// Gets the IDictionary of TKey and TValue type implemented on the given type or null if it isn't implemented.
+        /// </summary>
+        /// <param name="type">
+        /// The Type to get the dictionary interface for.
+        /// </param>
+        /// <returns>
+        /// An instance of Type or null if the dictionary interface isn't implemented.
+        /// </returns>
+        public static Type GetIDictionaryType(this Type type)
+        {
+            Type[] interfaces = type.GetInterfaces();
+
+            foreach (Type iface in interfaces)
+            {
+                if (iface.IsGenericType)
+                {
+                    Type generic = iface.GetGenericTypeDefinition();
+
+                    if (generic == typeof(IDictionary<,>))
+                    {
+                        return iface;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Finds the generic IEnumerable implemented by the given seqType.
         /// </summary>
         /// <param name="sequenceType">

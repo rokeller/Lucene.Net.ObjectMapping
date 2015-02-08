@@ -1255,43 +1255,5 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             return result;
         }
-
-        private void VerifyTopDocsTestObjects(Searcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive)
-        {
-            VerifyTopDocsTestObjects(searcher, topDocs, startNumberInclusive, endNumberExclusive, false);
-        }
-
-        private void VerifyTopDocsTestObjects(Searcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive, bool descending)
-        {
-            Assert.AreEqual(endNumberExclusive - startNumberInclusive, topDocs.TotalHits);
-
-            int number;
-
-            if (descending)
-            {
-                number = endNumberExclusive - 1;
-            }
-            else
-            {
-                number = startNumberInclusive;
-            }
-
-            foreach (ScoreDoc scoreDoc in topDocs.ScoreDocs)
-            {
-                Document doc = searcher.Doc(scoreDoc.Doc);
-                TestObject obj = doc.ToObject<TestObject>();
-                Assert.AreEqual(number, obj.Number);
-                Assert.AreEqual(String.Format("Test Object {0}", number), obj.String);
-
-                if (descending)
-                {
-                    number--;
-                }
-                else
-                {
-                    number++;
-                }
-            }
-        }
     }
 }

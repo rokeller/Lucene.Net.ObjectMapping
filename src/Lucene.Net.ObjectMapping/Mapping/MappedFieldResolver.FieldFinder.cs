@@ -28,21 +28,21 @@ namespace Lucene.Net.Mapping
             #endregion
 
             /// <summary>
-            /// Gets the MemberExpression which defines a field from the given Expression.
+            /// Gets the Expression which defines a field from the given Expression.
             /// </summary>
             /// <param name="expression">
             /// The Expression to find a field in.
             /// </param>
             /// <returns>
-            /// An instance of MemberExpression if a field was found or null otherwise.
+            /// An instance of Expression if a field was found or null otherwise.
             /// </returns>
-            internal MemberExpression GetField(Expression expression)
+            internal Expression GetField(Expression expression)
             {
                 Visit(expression);
 
                 if (candidates.Count > 1)
                 {
-                    return (MemberExpression)candidates.Pop();
+                    return candidates.Pop();
                 }
 
                 return null;
@@ -78,6 +78,7 @@ namespace Lucene.Net.Mapping
             protected override Expression VisitMember(MemberExpression node)
             {
                 Expression container = Visit(node.Expression);
+
                 if (candidates.Count > 0 && candidates.Peek() == container)
                 {
                     candidates.Push(node);
@@ -97,6 +98,18 @@ namespace Lucene.Net.Mapping
             /// </returns>
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
+                if (IsDictionaryGetItem(node))
+                {
+                    Expression container = Visit(node.Object);
+
+                    if (candidates.Count > 0 && candidates.Peek() == container)
+                    {
+                        candidates.Push(node);
+
+                        return node;
+                    }
+                }
+
                 candidates.Clear();
 
                 return node;

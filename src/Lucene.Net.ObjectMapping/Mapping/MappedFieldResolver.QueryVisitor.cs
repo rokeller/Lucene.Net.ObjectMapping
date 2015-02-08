@@ -301,8 +301,8 @@ namespace Lucene.Net.Mapping
             /// </returns>
             private MappedField GetFieldAndConstant(BinaryExpression expression, out Expression value)
             {
-                MemberExpression firstMember;
-                MemberExpression secondMember;
+                Expression firstMember;
+                Expression secondMember;
 
                 firstMember = new FieldFinder(Owner).GetField(expression.Left);
                 secondMember = new FieldFinder(Owner).GetField(expression.Right);
@@ -341,22 +341,24 @@ namespace Lucene.Net.Mapping
             }
 
             /// <summary>
-            /// Checks if the given MemberExpression is constant, i.e. it is a member of a constant.
+            /// Checks if the given Expression is constant, i.e. it is a member of a constant.
             /// </summary>
             /// <param name="expression">
-            /// The MemberExpression to check.
+            /// The Expression to check.
             /// </param>
             /// <returns>
-            /// True if the MemberExpression is constant, false otherwise.
+            /// True if the Expression is constant, false otherwise.
             /// </returns>
-            private static bool IsConstant(MemberExpression expression)
+            private static bool IsConstant(Expression expression)
             {
-                while (expression.Expression is MemberExpression)
+                MemberExpression member = expression as MemberExpression;
+
+                while (null != member && member.Expression is MemberExpression)
                 {
-                    expression = (MemberExpression)expression.Expression;
+                    member = (MemberExpression)member.Expression;
                 }
 
-                return (expression.Expression is ConstantExpression);
+                return null != member && member.Expression is ConstantExpression;
             }
 
             /// <summary>

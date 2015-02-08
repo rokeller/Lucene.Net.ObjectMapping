@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Search;
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -51,7 +52,7 @@ namespace Lucene.Net.Mapping
         #region Protected Methods
 
         /// <summary>
-        /// Gets the MappedField that describes the field mapped to the property of the given MemberExpression.
+        /// Gets the MappedField that describes the field mapped to the property of the given Expression.
         /// </summary>
         /// <param name="member">
         /// The Expression to get the MappedField for.
@@ -59,7 +60,28 @@ namespace Lucene.Net.Mapping
         /// <returns>
         /// A MappedField object which represents the mapped field, or null if the field is not mapped.
         /// </returns>
-        protected abstract MappedField GetMappedField(MemberExpression member);
+        protected abstract MappedField GetMappedField(Expression member);
+
+        /// <summary>
+        /// Checks if the given MethodCallExpression is to get an item from a dictionary.
+        /// </summary>
+        /// <param name="expression">
+        /// The MethodCallExpression to check.
+        /// </param>
+        /// <returns>
+        /// True if the expression is used to get an item from a dictionary, false otherwise.
+        /// </returns>
+        protected static bool IsDictionaryGetItem(MethodCallExpression expression)
+        {
+            if (null == expression)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            Type dictType = expression.Method.DeclaringType.GetIDictionaryType();
+
+            return null != dictType && expression.Method.Name == "get_Item";
+        }
 
         #endregion
 

@@ -14,7 +14,7 @@ namespace Lucene.Net.Mapping
         #region Protected Methods
 
         /// <summary>
-        /// Gets the MappedField that describes the field mapped to the property of the given MemberExpression.
+        /// Gets the MappedField that describes the field mapped to the property of the given Expression.
         /// </summary>
         /// <param name="member">
         /// The Expression to get the MappedField for.
@@ -22,7 +22,7 @@ namespace Lucene.Net.Mapping
         /// <returns>
         /// A MappedField object which represents the mapped field, or null if the field is not mapped.
         /// </returns>
-        protected override MappedField GetMappedField(MemberExpression member)
+        protected override MappedField GetMappedField(Expression member)
         {
             Type memberType;
             MappedField.FieldType type = GetFieldType(member, out memberType);
@@ -42,45 +42,110 @@ namespace Lucene.Net.Mapping
         #region Private Methods
 
         /// <summary>
-        /// Gets the field name from the given MemberExpression.
+        /// Gets the field name from the given Expression.
         /// </summary>
-        /// <param name="member">
-        /// The MemberExpression to get the field name from.
+        /// <param name="expression">
+        /// The Expression to get the field name from.
         /// </param>
         /// <returns>
-        /// A string that represents the name of the field from the MemberExpression.
+        /// A string that represents the name of the field from the Expression.
         /// </returns>
-        private string GetFieldName(MemberExpression member)
+        private string GetFieldName(Expression expression)
         {
-            StringBuilder sb = new StringBuilder(member.Member.Name);
+            StringBuilder sb = new StringBuilder();
 
-            while (member.Expression is MemberExpression)
-            {
-                member = member.Expression as MemberExpression;
+            AddFieldName(expression, sb);
 
-                sb.Insert(0, ".");
-                sb.Insert(0, member.Member.Name);
-            }
+            // The string builder now starts with a period, which we need to remove.
+            sb.Remove(0, 1);
 
             return sb.ToString();
         }
 
         /// <summary>
-        /// Gets the mapped FieldType for the field from the given MemberExpression.
+        /// Adds the field name from the given Expression to the specified StringBuilder.
         /// </summary>
-        /// <param name="member">
-        /// The MemberExpression to get the field type from.
+        /// <param name="expression">
+        /// The Expression to add the field name for.
+        /// </param>
+        /// <param name="sb">
+        /// The StringBuilder to add the field name to.
+        /// </param>
+        private void AddFieldName(Expression expression, StringBuilder sb)
+        {
+            MemberExpression member = expression as MemberExpression;
+            MethodCallExpression call = expression as MethodCallExpression;
+            ParameterExpression param = expression as ParameterExpression;
+
+            if (null != member)
+            {
+                AddFieldName(member, sb);
+            }
+            else if (null != call)
+            {
+                AddFieldName(call, sb);
+            }
+            else if (null != param)
+            {
+                // Nothing todo, since we found the param.
+            }
+            else
+            {
+                throw new NotSupportedException(String.Format("Cannot find the field for the expression: {0}.", expression));
+            }
+        }
+
+        /// <summary>
+        /// Adds the field name from the given MemberExpression to the specified StringBuilder.
+        /// </summary>
+        /// <param name="expression">
+        /// The MemberExpression to add the field name for.
+        /// </param>
+        /// <param name="sb">
+        /// The StringBuilder to add the field name to.
+        /// </param>
+        private void AddFieldName(MemberExpression expression, StringBuilder sb)
+        {
+            AddFieldName(expression.Expression, sb);
+            sb.Append('.');
+            sb.Append(expression.Member.Name);
+        }
+
+        /// <summary>
+        /// Adds the field name from the given MethodCallExpression to the specified StringBuilder.
+        /// </summary>
+        /// <param name="expression">
+        /// The MethodCallExpression to add the field name for.
+        /// </param>
+        /// <param name="sb">
+        /// The StringBuilder to add the field name to.
+        /// </param>
+        private void AddFieldName(MethodCallExpression expression, StringBuilder sb)
+        {
+            if (IsDictionaryGetItem(expression))
+            {
+                AddFieldName(expression.Object, sb);
+                sb.Append('.');
+                sb.Append(expression.Arguments[0].GetValue<string>());
+            }
+        }
+
+        /// <summary>
+        /// Gets the mapped FieldType for the field from the given Expression.
+        /// </summary>
+        /// <param name="expression">
+        /// The Expression to get the field type from.
         /// </param>
         /// <param name="memberType">
         /// If successful, holds the actual type of the member property or field being mapped.
         /// </param>
         /// <returns>
-        /// A MappedField.FieldType that represents the type of the mapped field from the MemberExpression.
+        /// A MappedField.FieldType that represents the type of the mapped field from the Expression.
         /// </returns>
-        private MappedField.FieldType GetFieldType(MemberExpression member, out Type memberType)
+        private MappedField.FieldType GetFieldType(Expression expression, out Type memberType)
         {
-            Type type = member.Type;
-            Type enumerableMemberType = member.Type.GetEnumerableElementType();
+            Type type = expression.Type;
+            Type enumerableMemberType = expression.Type.GetEnumerableElementType();
 
             if (null != enumerableMemberType && type != enumerableMemberType)
             {
@@ -93,6 +158,7 @@ namespace Lucene.Net.Mapping
                 type == typeof(int) || type == typeof(uint) ||
                 type == typeof(short) || type == typeof(ushort) ||
                 type == typeof(sbyte) || type == typeof(byte) ||
+                type == typeof(DateTime) ||
                 type.IsEnum)
             {
                 return MappedField.FieldType.Long;
@@ -191,15 +257,27 @@ namespace Lucene.Net.Mapping
                 }
                 else if (memberType == typeof(Uri))
                 {
-                    return (T)((object)expression.GetValue<Uri>().ToString());
+                    Uri uri = expression.GetValue<Uri>();
+
+                    return (T)((object)uri.ToString());
                 }
                 else if (memberType == typeof(Guid))
                 {
-                    return (T)((object)expression.GetValue<Guid>().ToString());
+                    Guid guid = expression.GetValue<Guid>();
+
+                    return (T)((object)guid.ToString());
                 }
                 else if (memberType == typeof(bool))
                 {
-                    return (T)((object)(expression.GetValue<bool>() ? 1 : 0));
+                    int val = expression.GetValue<bool>() ? 1 : 0;
+
+                    return (T)((object)val);
+                }
+                else if (memberType == typeof(DateTime))
+                {
+                    long ticks = expression.GetValue<DateTime>().Ticks;
+
+                    return (T)((object)ticks);
                 }
 
                 throw new NotSupportedException(String.Format("The member type '{0}' is not supported.", memberType));
