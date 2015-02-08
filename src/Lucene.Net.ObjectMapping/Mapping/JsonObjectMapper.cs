@@ -50,6 +50,17 @@ namespace Lucene.Net.Mapping
         }
 
         /// <summary>
+        /// Gets the MappedFieldResolver used by this instance.
+        /// </summary>
+        /// <returns>
+        /// A MappedFieldResolver.
+        /// </returns>
+        public MappedFieldResolver GetMappedFieldResolver()
+        {
+            return new JsonFieldNameResolver();
+        }
+
+        /// <summary>
         /// Gets the QueryProvider used by this instance.
         /// </summary>
         /// <param name="searcher">

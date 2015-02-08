@@ -2,12 +2,14 @@
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.Linq;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lucene.Net.ObjectMapping.Tests
 {
@@ -139,6 +141,64 @@ namespace Lucene.Net.ObjectMapping.Tests
 
         #endregion
 
+        #region Update with Expressions
+
+        [Test]
+        public void UpdateWithExpressionSuccess()
+        {
+            const int NumObjects = 10;
+            WriteTestObjects(NumObjects, o => o.ToDocument());
+
+            TestObject t = new TestObject()
+            {
+                Number = 1234,
+                String = "Test Object 1234",
+            };
+
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+            writer.Add(t);
+            writer.Commit();
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+
+            TestObject t2 = new TestObject()
+            {
+                Number = 2345,
+                String = "Something Else 2345",
+            };
+
+            writer.Update(t2, o => o.String == "1234");
+            writer.Commit();
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir))
+            {
+                // Verify that the updated item can be found.
+                TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
+
+                Assert.AreEqual(t2.Number, t3.Number);
+                Assert.AreEqual(t2.String, t3.String);
+
+                // Verify that the old item cannot be found anymore.
+                TestObject t4 = searcher.AsQueryable<TestObject>().SingleOrDefault(o => o.Number == 1234);
+                Assert.IsNull(t4);
+
+                // Verify that all other items remain untouched.
+                TestObject[] others = (from o in searcher.AsQueryable<TestObject>()
+                                       where o.Number != 2345
+                                       select o).ToArray();
+                Assert.IsNotNull(others);
+                Assert.AreEqual(NumObjects, others.Length);
+
+                foreach (TestObject o in others)
+                {
+                    Assert.AreNotEqual(t2.Number, o.Number);
+                    Assert.AreNotEqual(t2.String, o.String);
+                }
+            }
+        }
+
+        #endregion
+
         #region Update
 
         [Test]
@@ -166,7 +226,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             try
             {
-                writer.Update(new object(), null);
+                writer.Update(new object(), (Query)null);
                 Assert.Fail("Must get an exception.");
             }
             catch (ArgumentNullException ex)
@@ -491,6 +551,25 @@ namespace Lucene.Net.ObjectMapping.Tests
             }
 
             Assert.AreEqual(1, nTerms);
+        }
+
+        #endregion
+
+        #region Delete with Expressions
+
+        [Test]
+        public void DeleteSuccess()
+        {
+            const int NumObjects = 10;
+            const int MaxDeletedExclusive = 5;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+
+            writer.Delete<TestObject>(t => t.Number.InRange(null, MaxDeletedExclusive, false, false));
+            writer.Commit();
+
+            VerifyTestObjects(NumObjects, MaxDeletedExclusive);
         }
 
         #endregion

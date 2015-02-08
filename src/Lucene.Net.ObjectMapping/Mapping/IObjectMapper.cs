@@ -24,6 +24,14 @@ namespace Lucene.Net.Mapping
         void AddToDocument<TObject>(TObject source, Document doc);
 
         /// <summary>
+        /// Gets the MappedFieldResolver used by this instance.
+        /// </summary>
+        /// <returns>
+        /// A MappedFieldResolver.
+        /// </returns>
+        MappedFieldResolver GetMappedFieldResolver();
+
+        /// <summary>
         /// Gets the QueryProvider used by this instance.
         /// </summary>
         /// <param name="searcher">
