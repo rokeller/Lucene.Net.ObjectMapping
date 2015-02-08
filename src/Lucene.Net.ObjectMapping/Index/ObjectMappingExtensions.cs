@@ -1,7 +1,9 @@
 ﻿using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
+using Lucene.Net.Mapping;
 using Lucene.Net.Search;
 using System;
+using System.Linq.Expressions;
 
 namespace Lucene.Net.Index
 {
@@ -74,6 +76,43 @@ namespace Lucene.Net.Index
         #endregion
 
         #region Update
+
+        /// <summary>
+        /// Updates the specified object in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="obj">
+        /// The new object to write.
+        /// </param>
+        /// <param name="predicate">
+        /// The predicate for selecting the item to update.
+        /// </param>
+        public static void Update<T>(this IndexWriter writer, T obj, Expression<Func<T, bool>> predicate)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == obj)
+            {
+                throw new ArgumentNullException("obj");
+            }
+            else if (null == predicate)
+            {
+                throw new ArgumentNullException("predicate");
+            }
+
+            MappingSettings settings = MappingSettings.Default;
+            MappedFieldResolver resolver = settings.ObjectMapper.GetMappedFieldResolver();
+            Query query = resolver.GetQuery(predicate);
+
+            Update(writer, obj, query);
+        }
 
         /// <summary>
         /// Updates the specified object in the IndexWriter.
@@ -234,6 +273,36 @@ namespace Lucene.Net.Index
         #endregion
 
         #region DeleteDocuments
+
+        /// <summary>
+        /// Deletes the matching objects in the IndexWriter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// The type of the object to update.
+        /// </typeparam>
+        /// <param name="writer">
+        /// The IndexWriter to update the object in.
+        /// </param>
+        /// <param name="predicate">
+        /// The predicate for selecting the item to update.
+        /// </param>
+        public static void Delete<T>(this IndexWriter writer, Expression<Func<T, bool>> predicate)
+        {
+            if (null == writer)
+            {
+                throw new ArgumentNullException("writer");
+            }
+            else if (null == predicate)
+            {
+                throw new ArgumentNullException("predicate");
+            }
+
+            MappingSettings settings = MappingSettings.Default;
+            MappedFieldResolver resolver = settings.ObjectMapper.GetMappedFieldResolver();
+            Query query = resolver.GetQuery(predicate);
+
+            DeleteDocuments<T>(writer, query);
+        }
 
         /// <summary>
         /// Deletes the documents for objects of the given type matching the given selection.
