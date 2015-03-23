@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using NUnit.Framework;
 using System;
@@ -8,6 +9,33 @@ namespace Lucene.Net.ObjectMapping.Tests
     [TestFixture]
     public class ObjectMappingTest
     {
+		[Test]
+		public void ShouldRespectConventions()
+		{
+			var obj = new TestObject
+			{
+				String = "This is a test!"
+			};
+
+			var customMappingSettings = new MappingSettings
+			{
+				ObjectMapper = new JsonObjectMapper(new Conventions
+				{
+					ShouldStringFieldBeAnalyzed = (name, type) => false,
+					ShouldStringFieldBeStored = (name, type) => true
+				})
+			};
+
+			var docWithDefaultConventions = obj.ToDocument();
+			var docWithCustomConventions = obj.ToDocument(customMappingSettings);
+
+			Assert.True(docWithDefaultConventions.GetField("String").IsTokenized);
+			Assert.False(docWithDefaultConventions.GetField("String").IsStored);
+
+			Assert.False(docWithCustomConventions.GetField("String").IsTokenized);
+			Assert.True(docWithCustomConventions.GetField("String").IsStored);
+		}
+
         [Test]
         public void PropertyTypes()
         {

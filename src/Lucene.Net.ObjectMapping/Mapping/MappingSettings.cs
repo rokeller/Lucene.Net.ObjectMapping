@@ -12,7 +12,7 @@ namespace Lucene.Net.Mapping
         /// </summary>
         public static readonly MappingSettings Default = new MappingSettings()
         {
-            ObjectMapper = new JsonObjectMapper(),
+            ObjectMapper = new JsonObjectMapper(Conventions.Default),
         };
 
         /// <summary>

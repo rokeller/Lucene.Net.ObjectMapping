@@ -29,7 +29,21 @@ namespace Lucene.Net.Mapping
 
         #endregion
 
-        #region IObjectMapper Implementation
+		#region Constructor(s)
+
+		public JsonObjectMapper(Conventions conventions)
+		{
+			if (null == conventions)
+				throw new ArgumentNullException("conventions");
+
+			Conventions = conventions;
+		}
+
+		#endregion
+
+		#region IObjectMapper Implementation
+
+		public Conventions Conventions { get; set; }
 
         /// <summary>
         /// Adds the given source object to the specified Document.
@@ -90,7 +104,7 @@ namespace Lucene.Net.Mapping
         /// <param name="token">
         /// The JToken to add.
         /// </param>
-        private static void Add(Document doc, string prefix, JToken token)
+        private void Add(Document doc, string prefix, JToken token)
         {
             if (token is JObject)
             {
@@ -104,6 +118,11 @@ namespace Lucene.Net.Mapping
             {
                 JValue value = token as JValue;
                 IConvertible convertible = value as IConvertible;
+
+				var stringFieldStore = (Conventions.ShouldStringFieldBeStored(prefix, value.Type)) ? 
+					Field.Store.YES : Field.Store.NO;
+				var stringFieldAnalyze = (Conventions.ShouldStringFieldBeAnalyzed(prefix, value.Type)) ?
+					Field.Index.ANALYZED : Field.Index.NOT_ANALYZED;
 
                 switch (value.Type)
                 {
@@ -138,7 +157,7 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.String:
-                        doc.Add(new Field(prefix, value.Value.ToString(), Field.Store.NO, Field.Index.ANALYZED));
+						doc.Add(new Field(prefix, value.Value.ToString(), stringFieldStore, stringFieldAnalyze));
                         break;
 
                     case JTokenType.TimeSpan:
@@ -146,7 +165,7 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.Uri:
-                        doc.Add(new Field(prefix, value.Value.ToString(), Field.Store.NO, Field.Index.ANALYZED));
+						doc.Add(new Field(prefix, value.Value.ToString(), stringFieldStore, stringFieldAnalyze));
                         break;
 
                     default:
@@ -172,7 +191,7 @@ namespace Lucene.Net.Mapping
         /// <param name="obj">
         /// The JObject to add.
         /// </param>
-        private static void AddProperties(Document doc, string prefix, JObject obj)
+        private void AddProperties(Document doc, string prefix, JObject obj)
         {
             foreach (JProperty property in obj.Properties())
             {
@@ -192,7 +211,7 @@ namespace Lucene.Net.Mapping
         /// <param name="array">
         /// The JArray to add.
         /// </param>
-        private static void AddArray(Document doc, string prefix, JArray array)
+        private void AddArray(Document doc, string prefix, JArray array)
         {
             for (int i = 0; i < array.Count; i++)
             {
@@ -222,7 +241,8 @@ namespace Lucene.Net.Mapping
                 return String.Format("{0}.{1}", prefix, add);
             }
             else
-            {
+            
+			{
                 return add.ToString();
             }
         }

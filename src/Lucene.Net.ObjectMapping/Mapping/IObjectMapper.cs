@@ -9,6 +9,11 @@ namespace Lucene.Net.Mapping
     /// </summary>
     public interface IObjectMapper
     {
+		/// <summary>
+		/// conventions to use when mapping objects
+		/// </summary>
+		Conventions Conventions { get; set; }
+
         /// <summary>
         /// Adds the given source object to the specified Document.
         /// </summary>
