@@ -1,5 +1,8 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Linq;
+using Lucene.Net.Mapping;
 using System;
+using System.Linq;
 
 namespace Lucene.Net.Search
 {
@@ -8,6 +11,30 @@ namespace Lucene.Net.Search
     /// </summary>
     public static class ObjectMappingExtensions
     {
+        /// <summary>
+        /// Creates an IQueryable to find documents of type TElement.
+        /// </summary>
+        /// <typeparam name="TElement">
+        /// The type of objects to return with the query.
+        /// </typeparam>
+        /// <param name="searcher">
+        /// The Searcher to user.
+        /// </param>
+        /// <returns>
+        /// An IQueryable of TElement.
+        /// </returns>
+        public static IQueryable<TElement> AsQueryable<TElement>(this Searcher searcher)
+        {
+            if (null == searcher)
+            {
+                throw new ArgumentNullException("searcher");
+            }
+
+            MappingSettings settings = MappingSettings.Default;
+
+            return new LuceneQueryable<TElement>(settings.ObjectMapper.GetQueryProvider(searcher));
+        }
+
         #region Plain Query, no Sort
 
         /// <summary>

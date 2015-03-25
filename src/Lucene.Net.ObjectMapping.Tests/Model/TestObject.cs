@@ -20,5 +20,15 @@ namespace Lucene.Net.ObjectMapping.Tests.Model
         public long Long { get; set; }
         public short Short { get; set; }
         public byte Byte { get; set; }
+
+        public MyEnum Enum { get; set; }
+    }
+
+    public enum MyEnum
+    {
+        First,
+        Second,
+        Third,
+        Forth,
     }
 }
