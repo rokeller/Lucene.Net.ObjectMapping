@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using NUnit.Framework;
 using System;
@@ -307,6 +308,124 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
+        public void DoNotStoreSource()
+        {
+            MappingSettings settings = new MappingSettings()
+            {
+                ObjectMapper = new JsonObjectMapper(),
+                StoreSettings = new StoreSettings()
+                {
+                    StoreSource = false,
+                },
+            };
+
+            DateTime now = DateTime.Now;
+
+            SimpleObject obj = new SimpleObject()
+            {
+                Id = Guid.NewGuid(),
+
+                Text = "This object's source is not stored in the index.",
+                Timestamp = DateTime.UtcNow,
+            };
+
+            Document doc = obj.ToDocument(settings);
+            Assert.NotNull(doc);
+            int remainingFields = 3 /* total fields */;
+
+            foreach (IFieldable field in doc.GetFields())
+            {
+                if (field.IsStored)
+                {
+                    switch (field.Name)
+                    {
+                        case "$actualType":
+                        case "$staticType":
+                        case "$timestamp":
+                            // These fields are all expected.
+                            break;
+
+                        case "$source":
+                        default:
+                            Assert.Fail("Unspected stored field: {0}", field.Name);
+                            break;
+                    }
+                }
+                else
+                {
+                    remainingFields--;
+
+                    switch (field.Name)
+                    {
+                        case "Id":
+                            Assert.False(field.IsTokenized);
+                            Assert.True(field.IsIndexed);
+                            Assert.AreEqual(obj.Id.ToString(), field.StringValue);
+                            break;
+
+                        case "Text":
+                            Assert.True(field.IsTokenized);
+                            Assert.True(field.IsIndexed);
+                            Assert.AreEqual(obj.Text.ToString(), field.StringValue);
+                            break;
+
+                        case "Timestamp":
+                            Assert.True(field.IsTokenized);
+                            Assert.True(field.IsIndexed);
+                            Assert.AreEqual(obj.Timestamp.Ticks.ToString(), field.StringValue);
+                            break;
+
+                        default:
+                            Assert.Fail("Must get one of the expected fields.");
+                            break;
+                    }
+                }
+            }
+
+            Assert.AreEqual(0, remainingFields);
+        }
+
+        [Test]
+        public void DoNotStoreSourceRoundtripException()
+        {
+            MappingSettings settings = new MappingSettings()
+            {
+                ObjectMapper = new JsonObjectMapper(),
+                StoreSettings = new StoreSettings()
+                {
+                    StoreSource = false,
+                },
+            };
+
+            DateTime now = DateTime.Now;
+
+            SimpleObject obj = new SimpleObject()
+            {
+                Id = Guid.NewGuid(),
+
+                Text = "This object's source is not stored in the index.",
+                Timestamp = DateTime.UtcNow,
+            };
+
+            Document doc = obj.ToDocument(settings);
+            Assert.NotNull(doc);
+
+            try
+            {
+                doc.ToObject<SimpleObject>();
+                Assert.Fail("Must get an exception.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual(
+                    "Cannot convert the Document to an object of type <Lucene.Net.ObjectMapping.Tests.Model.SimpleObject>: The '$source' field is missing.",
+                    ex.Message);
+            }
+        }
+
+        #region ToDocument Input Validation
+
+        [Test]
         public void ArgumentExceptionForMissingSettings()
         {
             try
@@ -321,5 +440,51 @@ namespace Lucene.Net.ObjectMapping.Tests
                 Assert.AreEqual("mappingSettings", ex.ParamName);
             }
         }
+
+        [Test]
+        public void ArgumentExceptionForMissingObjectMapper()
+        {
+            try
+            {
+                MappingSettings settings = new MappingSettings()
+                {
+                    ObjectMapper = null,
+                    StoreSettings = StoreSettings.Default,
+                };
+
+                TestObject obj = new TestObject();
+                obj.ToDocument(settings);
+
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("mappingSettings.ObjectMapper", ex.ParamName);
+            }
+        }
+
+        [Test]
+        public void ArgumentExceptionForMissingStoreSettings()
+        {
+            try
+            {
+                MappingSettings settings = new MappingSettings()
+                {
+                    ObjectMapper = new JsonObjectMapper(),
+                    StoreSettings = null,
+                };
+
+                TestObject obj = new TestObject();
+                obj.ToDocument(settings);
+
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("mappingSettings.StoreSettings", ex.ParamName);
+            }
+        }
+
+        #endregion
     }
 }

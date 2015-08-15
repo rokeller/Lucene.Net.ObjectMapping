@@ -54,6 +54,7 @@
     <Compile Include="Model\NestedTestObjectB.cs" />
     <Compile Include="Model\NestedTestObjectC.cs" />
     <Compile Include="Model\ObjectWithDict.cs" />
+    <Compile Include="Model\SimpleObject.cs" />
     <Compile Include="Model\TestObject.cs" />
     <Compile Include="ObjectMappingTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

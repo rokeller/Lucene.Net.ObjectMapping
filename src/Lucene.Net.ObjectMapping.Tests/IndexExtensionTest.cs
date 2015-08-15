@@ -3,6 +3,7 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Linq;
+using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
@@ -10,6 +11,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Lucene.Net.ObjectMapping.Tests
 {
@@ -42,6 +44,26 @@ namespace Lucene.Net.ObjectMapping.Tests
             catch (ArgumentNullException ex)
             {
                 Assert.AreEqual("obj", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Add<object>(new object(), (MappingSettings)null);
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Add<object>(new object(), null, new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
             }
         }
 
@@ -100,7 +122,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             try
             {
-                writer.Add(new object(), null);
+                writer.Add(new object(), (Analyzer)null);
                 Assert.Fail("Must get an exception.");
             }
             catch (ArgumentNullException ex)
@@ -142,6 +164,118 @@ namespace Lucene.Net.ObjectMapping.Tests
         #endregion
 
         #region Update with Expressions
+
+        [Test]
+        public void UpdateWithExpressionArgumentExceptions()
+        {
+            IndexWriter oldWriter = writer;
+
+            try
+            {
+                writer = null;
+                writer.Update(new SimpleObject(), MappingSettings.Default, o => o.Text == "Blah");
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("writer", ex.ParamName);
+            }
+            finally
+            {
+                writer = oldWriter;
+            }
+
+            try
+            {
+                writer.Update<SimpleObject>(null, MappingSettings.Default, o => o.Text == "Blah");
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("obj", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new SimpleObject(), null, o => o.Text == "Blah");
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new SimpleObject(), MappingSettings.Default, (Expression<Func<SimpleObject, bool>>)null);
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("predicate", ex.ParamName);
+            }
+        }
+
+        [Test]
+        public void UpdateWithExpressionAndAnalyzerArgumentExceptions()
+        {
+            IndexWriter oldWriter = writer;
+
+            try
+            {
+                writer = null;
+                writer.Update(new SimpleObject(), MappingSettings.Default, o => o.Text == "Blah", new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("writer", ex.ParamName);
+            }
+            finally
+            {
+                writer = oldWriter;
+            }
+
+            try
+            {
+                writer.Update<SimpleObject>(null, MappingSettings.Default, o => o.Text == "Blah", new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("obj", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new SimpleObject(), null, o => o.Text == "Blah", new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new SimpleObject(), MappingSettings.Default, (Expression<Func<SimpleObject, bool>>)null, new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("predicate", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new SimpleObject(), MappingSettings.Default, o => o.Text == "Blah", null);
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("analyzer", ex.ParamName);
+            }
+        }
 
         [Test]
         public void UpdateWithExpressionSuccess()
@@ -197,6 +331,61 @@ namespace Lucene.Net.ObjectMapping.Tests
             }
         }
 
+        [Test]
+        public void UpdateWithExpressionAndAnalyzerSuccess()
+        {
+            Analyzer analyzer = new KeywordAnalyzer();
+            const int NumObjects = 10;
+            WriteTestObjects(NumObjects, o => o.ToDocument(), analyzer);
+
+            TestObject t = new TestObject()
+            {
+                Number = 1234,
+                String = "Test Object 1234",
+            };
+
+            Assert.AreEqual(NumObjects, writer.NumDocs());
+            writer.Add(t, analyzer);
+            writer.Commit();
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+
+            TestObject t2 = new TestObject()
+            {
+                Number = 2345,
+                String = "Something Else 2345",
+            };
+
+            writer.Update(t2, MappingSettings.Default, o => o.String == "Test Object 1234", analyzer);
+            writer.Commit();
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+
+            using (Searcher searcher = new IndexSearcher(dir))
+            {
+                // Verify that the updated item can be found.
+                TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
+
+                Assert.AreEqual(t2.Number, t3.Number);
+                Assert.AreEqual(t2.String, t3.String);
+
+                // Verify that the old item cannot be found anymore.
+                TestObject t4 = searcher.AsQueryable<TestObject>().SingleOrDefault(o => o.Number == 1234);
+                Assert.IsNull(t4);
+
+                // Verify that all other items remain untouched.
+                TestObject[] others = (from o in searcher.AsQueryable<TestObject>()
+                                       where o.Number != 2345
+                                       select o).ToArray();
+                Assert.IsNotNull(others);
+                Assert.AreEqual(NumObjects, others.Length);
+
+                foreach (TestObject o in others)
+                {
+                    Assert.AreNotEqual(t2.Number, o.Number);
+                    Assert.AreNotEqual(t2.String, o.String);
+                }
+            }
+        }
+
         #endregion
 
         #region Update
@@ -212,6 +401,16 @@ namespace Lucene.Net.ObjectMapping.Tests
             catch (ArgumentNullException ex)
             {
                 Assert.AreEqual("writer", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new object(), null, new MatchAllDocsQuery());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
             }
 
             try
@@ -309,6 +508,16 @@ namespace Lucene.Net.ObjectMapping.Tests
             {
                 Assert.AreEqual("selection", ex.ParamName);
             }
+
+            try
+            {
+                writer.Update(new object(), DocumentObjectTypeKind.Static, null, new MatchAllDocsQuery());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
+            }
         }
 
         [Test]
@@ -388,6 +597,16 @@ namespace Lucene.Net.ObjectMapping.Tests
             catch (ArgumentNullException ex)
             {
                 Assert.AreEqual("obj", ex.ParamName);
+            }
+
+            try
+            {
+                writer.Update(new object(), null, new MatchAllDocsQuery(), new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
             }
 
             try
@@ -478,6 +697,16 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             try
             {
+                writer.Update(new object(), DocumentObjectTypeKind.Static, null, new MatchAllDocsQuery(), new KeywordAnalyzer());
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("settings", ex.ParamName);
+            }
+
+            try
+            {
                 writer.Update(new object(), DocumentObjectTypeKind.Static, null, new KeywordAnalyzer());
                 Assert.Fail("Must get an exception.");
             }
@@ -556,6 +785,37 @@ namespace Lucene.Net.ObjectMapping.Tests
         #endregion
 
         #region Delete with Expressions
+
+        [Test]
+        public void DeleteArgumentExceptions()
+        {
+            IndexWriter oldWriter = writer;
+
+            try
+            {
+                writer = null;
+                writer.Delete<SimpleObject>(o => o.Text == "Blah");
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("writer", ex.ParamName);
+            }
+            finally
+            {
+                writer = oldWriter;
+            }
+
+            try
+            {
+                writer.Delete<SimpleObject>(null);
+                Assert.Fail("Must get an exception.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.AreEqual("predicate", ex.ParamName);
+            }
+        }
 
         [Test]
         public void DeleteSuccess()
@@ -677,7 +937,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             dir.Dispose();
         }
 
-        private void WriteTestObjects(int count, Func<TestObject, Document> converter)
+        private void WriteTestObjects(int count, Func<TestObject, Document> converter, Analyzer analyzer = null)
         {
             for (int i = 0; i < count; i++)
             {
@@ -687,7 +947,14 @@ namespace Lucene.Net.ObjectMapping.Tests
                     String = String.Format("Test Object {0}", i),
                 };
 
-                writer.AddDocument(converter(obj));
+                if (null != analyzer)
+                {
+                    writer.AddDocument(converter(obj), analyzer);
+                }
+                else
+                {
+                    writer.AddDocument(converter(obj));
+                }
             }
 
             writer.Commit();

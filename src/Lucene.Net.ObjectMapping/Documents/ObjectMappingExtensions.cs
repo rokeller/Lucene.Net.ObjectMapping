@@ -87,13 +87,26 @@ namespace Lucene.Net.Documents
             {
                 throw new ArgumentNullException("mappingSettings");
             }
+            else if (null == mappingSettings.ObjectMapper)
+            {
+                throw new ArgumentNullException("mappingSettings.ObjectMapper");
+            }
+            else if (null == mappingSettings.StoreSettings)
+            {
+                throw new ArgumentNullException("mappingSettings.StoreSettings");
+            }
 
             Document doc = new Document();
             string json = JsonConvert.SerializeObject(source, typeof(TSource), settings);
 
             doc.Add(new Field(FieldActualType, Utils.GetTypeName(source.GetType()), Field.Store.YES, Field.Index.NOT_ANALYZED));
             doc.Add(new Field(FieldStaticType, Utils.GetTypeName(typeof(TSource)), Field.Store.YES, Field.Index.NOT_ANALYZED));
-            doc.Add(new Field(FieldSource, json, Field.Store.YES, Field.Index.NO));
+
+            if (mappingSettings.StoreSettings.StoreSource)
+            {
+                doc.Add(new Field(FieldSource, json, Field.Store.YES, Field.Index.NO));
+            }
+
             doc.Add(new NumericField(FieldTimestamp, Field.Store.YES, true).SetLongValue(DateTime.UtcNow.Ticks));
 
             mappingSettings.ObjectMapper.AddToDocument<TSource>(source, doc);
@@ -119,6 +132,13 @@ namespace Lucene.Net.Documents
             string staticTypeName = doc.Get(FieldStaticType);
             string source = doc.Get(FieldSource);
             string rawTimestamp = doc.Get(FieldTimestamp);
+
+            if (null == source)
+            {
+                throw new InvalidOperationException(String.Format(
+                    "Cannot convert the Document to an object of type <{0}>: The '$source' field is missing.",
+                    typeof(TObject)));
+            }
 
             // TODO: Additional checks on object types etc.
             TObject obj = JsonConvert.DeserializeObject<TObject>(source, settings);
