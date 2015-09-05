@@ -1,7 +1,10 @@
 @echo off
 
 if "%KEYFILE%" == "" (
-    echo Error: The key file is not specified.
+    echo Error: The key file is not specified. Use
+    echo.
+    echo SET KEYFILE=path-to-keyfile
+    echo.
     goto :EOF
 )
 
