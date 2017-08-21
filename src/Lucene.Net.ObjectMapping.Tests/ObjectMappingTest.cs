@@ -38,9 +38,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             Assert.NotNull(doc);
             int remainingFields = 16 /* total fields */ - 1 /* null field */;
 
-            foreach (IFieldable field in doc.GetFields())
+            foreach (var field in doc.Fields)
             {
-                if (field.IsStored)
+                if (field.FieldType.IsStored)
                 {
                     // Ignore stored fields here.
                     continue;
@@ -51,21 +51,21 @@ namespace Lucene.Net.ObjectMapping.Tests
                 switch (field.Name)
                 {
                     case "Guid":
-                        Assert.False(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Guid.ToString(), field.StringValue);
+                        Assert.False(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Guid.ToString(), field.GetStringValue());
                         break;
 
                     case "Boolean":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual("1", field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual("1", field.GetStringValue());
                         break;
 
                     case "Float":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Float.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Float, Convert.ToDouble(field.GetStringValue()), 4 );
                         break;
 
                     case "Null":
@@ -73,75 +73,75 @@ namespace Lucene.Net.ObjectMapping.Tests
                         break;
 
                     case "Number":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Number.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Number.ToString(), field.GetStringValue());
                         break;
 
                     case "String":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.String.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.String.ToString(), field.GetStringValue());
                         break;
 
                     case "TimeSpan":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.TimeSpan.Ticks.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.TimeSpan.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "TimestampLocal":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.TimestampLocal.Ticks.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.TimestampLocal.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "TimestampUtc":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.TimestampUtc.Ticks.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.TimestampUtc.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "Uri":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Uri.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Uri.ToString(), field.GetStringValue());
                         break;
 
                     case "Double":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Double.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Double.ToString(), field.GetStringValue());
                         break;
 
                     case "Decimal":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Decimal.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Decimal.ToString(), field.GetStringValue());
                         break;
 
                     case "Long":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Long.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Long.ToString(), field.GetStringValue());
                         break;
 
                     case "Short":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Short.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Short.ToString(), field.GetStringValue());
                         break;
 
                     case "Byte":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(obj.Byte.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(obj.Byte.ToString(), field.GetStringValue());
                         break;
 
                     case "Enum":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(((int)obj.Enum).ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(((int)obj.Enum).ToString(), field.GetStringValue());
                         break;
 
                     default:
@@ -212,9 +212,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             int remainingFields = 3 /* normal fields */ + 3 /* array fields */;
             int arrayIndex = 0;
 
-            foreach (IFieldable field in doc.GetFields())
+            foreach (var field in doc.Fields)
             {
-                if (field.IsStored)
+                if (field.FieldType.IsStored)
                 {
                     // Ignore stored fields here.
                     continue;
@@ -225,27 +225,27 @@ namespace Lucene.Net.ObjectMapping.Tests
                 switch (field.Name)
                 {
                     case "Id":
-                        Assert.False(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(a.Id.ToString(), field.StringValue);
+                        Assert.False(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(a.Id.ToString(), field.GetStringValue());
                         break;
 
                     case "B.Id":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(a.B.Id.ToString(), field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(a.B.Id.ToString(), field.GetStringValue());
                         break;
 
                     case "B.C.String":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(a.B.C.String, field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(a.B.C.String, field.GetStringValue());
                         break;
 
                     case "B.C.Array":
-                        Assert.True(field.IsTokenized);
-                        Assert.True(field.IsIndexed);
-                        Assert.AreEqual(a.B.C.Array[arrayIndex], field.StringValue);
+                        Assert.True(field.FieldType.IsTokenized);
+                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.AreEqual(a.B.C.Array[arrayIndex], field.GetStringValue());
                         arrayIndex++;
                         break;
 
@@ -333,9 +333,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             Assert.NotNull(doc);
             int remainingFields = 3 /* total fields */;
 
-            foreach (IFieldable field in doc.GetFields())
+            foreach (var field in doc.Fields)
             {
-                if (field.IsStored)
+                if (field.FieldType.IsStored)
                 {
                     switch (field.Name)
                     {
@@ -358,21 +358,21 @@ namespace Lucene.Net.ObjectMapping.Tests
                     switch (field.Name)
                     {
                         case "Id":
-                            Assert.False(field.IsTokenized);
-                            Assert.True(field.IsIndexed);
-                            Assert.AreEqual(obj.Id.ToString(), field.StringValue);
+                            Assert.False(field.FieldType.IsTokenized);
+                            Assert.True(field.FieldType.IsIndexed);
+                            Assert.AreEqual(obj.Id.ToString(), field.GetStringValue());
                             break;
 
                         case "Text":
-                            Assert.True(field.IsTokenized);
-                            Assert.True(field.IsIndexed);
-                            Assert.AreEqual(obj.Text.ToString(), field.StringValue);
+                            Assert.True(field.FieldType.IsTokenized);
+                            Assert.True(field.FieldType.IsIndexed);
+                            Assert.AreEqual(obj.Text.ToString(), field.GetStringValue());
                             break;
 
                         case "Timestamp":
-                            Assert.True(field.IsTokenized);
-                            Assert.True(field.IsIndexed);
-                            Assert.AreEqual(obj.Timestamp.Ticks.ToString(), field.StringValue);
+                            Assert.True(field.FieldType.IsTokenized);
+                            Assert.True(field.FieldType.IsIndexed);
+                            Assert.AreEqual(obj.Timestamp.Ticks.ToString(), field.GetStringValue());
                             break;
 
                         default:

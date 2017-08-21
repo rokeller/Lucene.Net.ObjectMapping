@@ -1,5 +1,6 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Lucene.Net.Queries;
 using System;
 using System.Diagnostics;
 
@@ -21,11 +22,9 @@ namespace Lucene.Net.Search
         /// </returns>
         public static Filter GetTypeFilter(Type type)
         {
-            TermsFilter filter = new TermsFilter();
-
-            filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldActualType, Utils.GetTypeName(type)));
-            filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldStaticType, Utils.GetTypeName(type)));
-
+            TermsFilter filter = new TermsFilter(
+                                    new Term(Documents.ObjectMappingExtensions.FieldActualType, Utils.GetTypeName(type)),
+                                    new Term(Documents.ObjectMappingExtensions.FieldStaticType, Utils.GetTypeName(type)));
             return filter;
         }
 
@@ -57,24 +56,18 @@ namespace Lucene.Net.Search
         /// </returns>
         public static Filter GetTypeFilter(Type type, DocumentObjectTypeKind kind)
         {
-            TermsFilter filter = new TermsFilter();
-
             switch (kind)
             {
                 case DocumentObjectTypeKind.Actual:
-                    filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldActualType, Utils.GetTypeName(type)));
-                    break;
+                    return new TermsFilter(new Term(Documents.ObjectMappingExtensions.FieldActualType, Utils.GetTypeName(type)));
 
                 case DocumentObjectTypeKind.Static:
-                    filter.AddTerm(new Term(Documents.ObjectMappingExtensions.FieldStaticType, Utils.GetTypeName(type)));
-                    break;
+                    return new TermsFilter(new Term(Documents.ObjectMappingExtensions.FieldStaticType, Utils.GetTypeName(type)));
 
                 default:
                     Debug.Fail("Unsupported DocumentObjectType: " + kind);
                     throw new NotSupportedException(String.Format("The DocumentObjectType '{0}' is not supported.", kind));
             }
-
-            return filter;
         }
 
         /// <summary>

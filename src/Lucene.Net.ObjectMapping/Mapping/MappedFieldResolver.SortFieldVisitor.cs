@@ -83,17 +83,17 @@ namespace Lucene.Net.Mapping
                     switch (value)
                     {
                         case GenericField.ActualType:
-                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldActualType, SortField.STRING, sortDescending);
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldActualType, SortFieldType.STRING, sortDescending);
                             break;
 
                         case GenericField.StaticType:
-                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldStaticType, SortField.STRING, sortDescending);
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldStaticType, SortFieldType.STRING, sortDescending);
                             break;
                         case GenericField.Source:
-                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldSource, SortField.STRING, sortDescending);
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldSource, SortFieldType.STRING, sortDescending);
                             break;
                         case GenericField.Timestamp:
-                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldTimestamp, SortField.LONG, sortDescending);
+                            sortField = new SortField(Documents.ObjectMappingExtensions.FieldTimestamp, SortFieldType.INT64, sortDescending);
                             break;
 
                         default:
@@ -125,32 +125,32 @@ namespace Lucene.Net.Mapping
                     throw new InvalidOperationException("The expression refers to a field which is not mapped: " + node);
                 }
 
-                int fieldType;
+                SortFieldType fieldType;
 
                 switch (mappedField.Type)
                 {
                     case MappedField.FieldType.Float:
-                        fieldType = SortField.FLOAT;
+                        fieldType = SortFieldType.DOUBLE;
                         break;
 
                     case MappedField.FieldType.Double:
-                        fieldType = SortField.DOUBLE;
+                        fieldType = SortFieldType.DOUBLE;
                         break;
 
                     case MappedField.FieldType.Short:
-                        fieldType = SortField.SHORT;
+                        fieldType = SortFieldType.INT32 ;
                         break;
 
                     case MappedField.FieldType.Int:
-                        fieldType = SortField.INT;
+                        fieldType = SortFieldType.INT32;
                         break;
 
                     case MappedField.FieldType.Long:
-                        fieldType = SortField.LONG;
+                        fieldType = SortFieldType.INT64;
                         break;
 
                     case MappedField.FieldType.String:
-                        fieldType = SortField.STRING;
+                        fieldType = SortFieldType.STRING;
                         break;
 
                     default:

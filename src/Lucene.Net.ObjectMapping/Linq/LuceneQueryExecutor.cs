@@ -40,7 +40,7 @@ namespace Lucene.Net.Linq
         /// <summary>
         /// The Searcher to use for the actual Lucene.Net query.
         /// </summary>
-        private readonly Searcher searcher;
+        private readonly IndexSearcher searcher;
 
         /// <summary>
         /// The MappedFieldResolver to use.
@@ -60,7 +60,7 @@ namespace Lucene.Net.Linq
         /// <param name="resolver">
         /// The MappedFieldResolver to use.
         /// </param>
-        public LuceneQueryExecutor(Searcher searcher, MappedFieldResolver resolver)
+        public LuceneQueryExecutor(IndexSearcher searcher, MappedFieldResolver resolver)
         {
             if (null == searcher)
             {
@@ -364,7 +364,7 @@ namespace Lucene.Net.Linq
                 return default(T);
             }
 
-            ScoreDoc[] scoreDocs = collector.TopDocs().ScoreDocs;
+            ScoreDoc[] scoreDocs = collector.GetTopDocs().ScoreDocs;
             Document doc = searcher.Doc(scoreDocs[0].Doc);
 
             return doc.ToObject<T>();
@@ -423,7 +423,7 @@ namespace Lucene.Net.Linq
                 return default(T);
             }
 
-            ScoreDoc[] scoreDocs = collector.TopDocs().ScoreDocs;
+            ScoreDoc[] scoreDocs = collector.GetTopDocs().ScoreDocs;
             Document doc = searcher.Doc(scoreDocs[0].Doc);
 
             return doc.ToObject<T>();
@@ -491,7 +491,7 @@ namespace Lucene.Net.Linq
 
             searcher.Search<T>(context.Query, collector);
 
-            ScoreDoc[] scoreDocs = collector.TopDocs().ScoreDocs;
+            ScoreDoc[] scoreDocs = collector.GetTopDocs().ScoreDocs;
 
             for (int i = start; i < end && i < scoreDocs.Length; i++)
             {

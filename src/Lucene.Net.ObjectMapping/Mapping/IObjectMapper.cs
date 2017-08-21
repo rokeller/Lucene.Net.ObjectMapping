@@ -40,6 +40,6 @@ namespace Lucene.Net.Mapping
         /// <returns>
         /// A QueryProvider.
         /// </returns>
-        QueryProvider GetQueryProvider(Searcher searcher);
+        QueryProvider GetQueryProvider(IndexSearcher searcher);
     }
 }

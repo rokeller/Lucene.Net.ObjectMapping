@@ -23,16 +23,17 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 8;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search(
-                    typeof(TestObject),
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
-                    NumObjects);
+                        typeof(TestObject),
+                        NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                        NumObjects);
 
-                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive);
+                VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive);                
             }
         }
 
@@ -44,14 +45,15 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 7;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
 
                 // The static type of none of the documents matches 'TestObject'.
@@ -60,7 +62,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
 
                 // The static type of none of the documents matches 'TestObject'.
@@ -76,12 +78,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search<TestObject>(
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
 
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive);
@@ -96,13 +99,14 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 9;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
 
                 // The static type of none of the documents matches 'TestObject'.
@@ -110,7 +114,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
 
                 // The static type of none of the documents matches 'TestObject'.
@@ -126,15 +130,16 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 8;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
             }
@@ -148,16 +153,17 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 7;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
@@ -165,9 +171,9 @@ namespace Lucene.Net.ObjectMapping.Tests
                 topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
@@ -182,14 +188,15 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search<TestObject>(
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
             }
@@ -203,24 +210,25 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 9;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopDocs topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
 
                 topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
-                    new Sort(new SortField("Number", SortField.LONG, true)));
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)));
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
@@ -235,12 +243,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 8;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopFieldCollector collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
@@ -248,10 +257,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                     false);
                 searcher.Search(
                     typeof(TestObject),
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                TopDocs topDocs = collector.TopDocs();
+                TopDocs topDocs = collector.GetTopDocs();
 
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
             }
@@ -268,12 +277,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             TopDocs topDocs;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
@@ -282,16 +292,16 @@ namespace Lucene.Net.ObjectMapping.Tests
                 searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                topDocs = collector.TopDocs();
+                topDocs = collector.GetTopDocs();
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
 
                 collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
@@ -300,10 +310,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                topDocs = collector.TopDocs();
+                topDocs = collector.GetTopDocs();
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
@@ -318,22 +328,23 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxNumberExclusive = 8;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 TopFieldCollector collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
                     false,
                     false);
                 searcher.Search<TestObject>(
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                TopDocs topDocs = collector.TopDocs();
+                TopDocs topDocs = collector.GetTopDocs();
 
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
             }
@@ -350,12 +361,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             TopDocs topDocs;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir, true))
+            using (var reader = DirectoryReader.Open(dir))
             {
+                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
                 collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
@@ -363,16 +375,16 @@ namespace Lucene.Net.ObjectMapping.Tests
                     false);
                 searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Static,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                topDocs = collector.TopDocs();
+                topDocs = collector.GetTopDocs();
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, 0, 0, true);
 
                 collector = TopFieldCollector.Create(
-                    new Sort(new SortField("Number", SortField.LONG, true)),
+                    new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
                     false,
                     false,
@@ -380,10 +392,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                     false);
                 searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Actual,
-                    NumericRangeQuery.NewLongRange("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
+                    NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     collector);
 
-                topDocs = collector.TopDocs();
+                topDocs = collector.GetTopDocs();
 
                 // The static type of none of the documents matches 'TestObject'.
                 VerifyTopDocsTestObjects(searcher, topDocs, MinNumberInclusive, MaxNumberExclusive, true);
@@ -394,7 +406,7 @@ namespace Lucene.Net.ObjectMapping.Tests
         public void SetUp()
         {
             dir = new RAMDirectory();
-            writer = new IndexWriter(dir, new StandardAnalyzer(Util.Version.LUCENE_30), true, IndexWriter.MaxFieldLength.LIMITED);
+            writer = new IndexWriter(dir, new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, new StandardAnalyzer(Util.LuceneVersion.LUCENE_48)));
         }
 
         [TearDown]
@@ -420,12 +432,12 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
         }
 
-        private void VerifyTopDocsTestObjects(Searcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive)
+        private void VerifyTopDocsTestObjects(IndexSearcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive)
         {
             VerifyTopDocsTestObjects(searcher, topDocs, startNumberInclusive, endNumberExclusive, false);
         }
 
-        private void VerifyTopDocsTestObjects(Searcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive, bool descending)
+        private void VerifyTopDocsTestObjects(IndexSearcher searcher, TopDocs topDocs, int startNumberInclusive, int endNumberExclusive, bool descending)
         {
             Assert.AreEqual(endNumberExclusive - startNumberInclusive, topDocs.TotalHits);
 
