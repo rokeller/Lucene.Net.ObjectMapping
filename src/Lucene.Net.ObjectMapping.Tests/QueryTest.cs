@@ -27,9 +27,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
                 IQueryable<NestedTestObjectA> queryA = searcher.AsQueryable<NestedTestObjectA>();
@@ -50,9 +50,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
                 IQueryable<NestedTestObjectA> queryA = searcher.AsQueryable<NestedTestObjectA>();
@@ -76,9 +76,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 Assert.AreEqual(NumObjects, searcher.AsQueryable<TestObject>().Count());
                 Assert.AreEqual(NumObjects, searcher.AsQueryable<NestedTestObjectC>().Count());
@@ -109,9 +109,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>();
                 IOrderedQueryable<TestObject> orderedQuery = query
@@ -138,9 +138,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Number.InRange(MinNumberInclusive, MaxNumberExclusive, true, false))
@@ -167,9 +167,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // None of the objects have the term 'Test', they only have 'test'.
                 Assert.AreEqual(0, searcher.AsQueryable<TestObject>().Where(t => t.String.MatchesTerm("Test")).Count());
@@ -208,9 +208,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Guid.MatchesTerm(guid.ToString()));
@@ -232,9 +232,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>().OrderBy(t => t.Long).ThenByDescending(t => t.Number);
                 Console.WriteLine("Query: {0}", query);
@@ -274,9 +274,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .OrderBy(t => t.Long)
@@ -317,9 +317,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<TestObject> query = searcher.AsQueryable<TestObject>()
                     .Where(t => t.Number.InRange(null, 5, false, false))
@@ -345,9 +345,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteC(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(2 * NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // None of the objects have the term 'Number', they only have 'number'.
                 Assert.AreEqual(0, searcher.AsQueryable<NestedTestObjectB>().Where(t => t.C.String.MatchesTerm("Number")).Count());
@@ -395,9 +395,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on float range.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -451,9 +451,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact number match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -525,9 +525,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact number match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -607,9 +607,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact number match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -646,9 +646,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact number match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -683,9 +683,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             theGuid = WriteTestObjectsWithGuid(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact GUID match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -718,9 +718,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on an exact GUID match.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -745,9 +745,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Query on a boolean field, match true.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -802,11 +802,10 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
-            //using (var searcher = new IndexSearcher(dir, true))
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
                 // Try query comparing two members, which is not supported.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
                                                where (int)t.Enum == t.Number
@@ -825,9 +824,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -856,9 +855,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -879,9 +878,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -902,9 +901,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -925,9 +924,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -949,9 +948,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try First() for a single existing item.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -996,9 +995,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try First() for a single existing item.
                 TestObject result = searcher.AsQueryable<TestObject>().First(t => t.Number == 0);
@@ -1032,9 +1031,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try FirstOrDefault() for a single existing item.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -1073,9 +1072,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try FirstOrDefault() for a single existing item.
                 TestObject result = searcher.AsQueryable<TestObject>().FirstOrDefault(t => t.Number == 0);
@@ -1105,9 +1104,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try Single() for a single existing item.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -1158,9 +1157,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try Single() for a single existing item.
                 TestObject result = searcher.AsQueryable<TestObject>().Single(t => t.Number == 0);
@@ -1199,9 +1198,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try SingleOrDefault() for a single existing item.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
@@ -1245,9 +1244,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try SingleOrDefault() for a single existing item.
                 TestObject result = searcher.AsQueryable<TestObject>().SingleOrDefault(t => t.Number == 0);

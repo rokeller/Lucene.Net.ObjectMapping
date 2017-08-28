@@ -193,9 +193,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             Write(NumObjects);
             Assert.AreEqual(NumObjects, writer.MaxDoc);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 IQueryable<ObjectWithDict> query = from o in searcher.AsQueryable<ObjectWithDict>()
                                                    where o.StringMap["ItemD"].Text == "d"
@@ -229,7 +229,7 @@ namespace Lucene.Net.ObjectMapping.Tests
         public void SetUp()
         {
             dir = new RAMDirectory();
-            writer = new IndexWriter(dir, new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, new StandardAnalyzer(Util.LuceneVersion.LUCENE_48))); //fixme:  true, IndexWriter.MaxFieldLength.LIMITED are ommited from the Analyser constructor
+            writer = new IndexWriter(dir, new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, new StandardAnalyzer(Util.LuceneVersion.LUCENE_48)));
         }
 
         [TearDown]

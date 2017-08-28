@@ -108,19 +108,19 @@ namespace Lucene.Net.Mapping
                 switch (value.Type)
                 {
                     case JTokenType.Boolean:
-                        var boolFieldType = new FieldType(Int32Field.TYPE_NOT_STORED);
+                        FieldType boolFieldType = new FieldType(Int32Field.TYPE_NOT_STORED);
                         boolFieldType.IsIndexed = true;
                         doc.Add(new Int32Field(prefix, (bool)value.Value ? 1 : 0, boolFieldType));
                         break;
 
                     case JTokenType.Date:
-                        var dateFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
+                        FieldType dateFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
                         dateFieldType.IsIndexed = true;
                         doc.Add(new Int64Field(prefix, ((DateTime)value.Value).Ticks, dateFieldType));
                         break;
 
                     case JTokenType.Float:
-                        var floatFieldType = new FieldType(DoubleField.TYPE_NOT_STORED);
+                        FieldType floatFieldType = new FieldType(DoubleField.TYPE_NOT_STORED);
                         floatFieldType.IsIndexed = true;
 
                         if (value.Value is float)
@@ -138,7 +138,7 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.Integer:
-                        var intFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
+                        FieldType intFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
                         intFieldType.IsIndexed = true;
                         doc.Add(new Int64Field(prefix, Convert.ToInt64(value.Value), intFieldType));
                         break;
@@ -151,7 +151,7 @@ namespace Lucene.Net.Mapping
                         break;
 
                     case JTokenType.TimeSpan:
-                        var tsFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
+                        FieldType tsFieldType = new FieldType(Int64Field.TYPE_NOT_STORED);
                         tsFieldType.IsIndexed = true;
                         doc.Add(new Int64Field(prefix, ((TimeSpan)value.Value).Ticks, tsFieldType));
                         break;

@@ -25,9 +25,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search(
                         typeof(TestObject),
                         NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
@@ -47,9 +47,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Static,
@@ -80,9 +80,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search<TestObject>(
                     NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects);
@@ -101,9 +101,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Static,
                     NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
@@ -132,9 +132,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
                     NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
@@ -155,9 +155,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search(
                     typeof(TestObject),
                     DocumentObjectTypeKind.Static,
@@ -190,9 +190,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search<TestObject>(
                     NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
                     NumObjects,
@@ -212,9 +212,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopDocs topDocs = searcher.Search<TestObject>(
                     DocumentObjectTypeKind.Static,
                     NumericRangeQuery.NewInt64Range("Number", MinNumberInclusive, MaxNumberExclusive, true, false),
@@ -245,9 +245,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopFieldCollector collector = TopFieldCollector.Create(
                     new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
@@ -279,9 +279,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 collector = TopFieldCollector.Create(
                     new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
@@ -330,9 +330,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 TopFieldCollector collector = TopFieldCollector.Create(
                     new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,
@@ -363,9 +363,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>());
             Assert.AreEqual(NumObjects, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader); //fixme: readonly flag ignored
+                IndexSearcher searcher = new IndexSearcher(reader);
                 collector = TopFieldCollector.Create(
                     new Sort(new SortField("Number", SortFieldType.INT64, true)),
                     NumObjects,

@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using NUnit.Framework;
@@ -38,7 +39,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             Assert.NotNull(doc);
             int remainingFields = 16 /* total fields */ - 1 /* null field */;
 
-            foreach (var field in doc.Fields)
+            foreach (IIndexableField field in doc.Fields)
             {
                 if (field.FieldType.IsStored)
                 {
@@ -212,7 +213,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             int remainingFields = 3 /* normal fields */ + 3 /* array fields */;
             int arrayIndex = 0;
 
-            foreach (var field in doc.Fields)
+            foreach (IIndexableField field in doc.Fields)
             {
                 if (field.FieldType.IsStored)
                 {
@@ -333,7 +334,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             Assert.NotNull(doc);
             int remainingFields = 3 /* total fields */;
 
-            foreach (var field in doc.Fields)
+            foreach (IIndexableField field in doc.Fields)
             {
                 if (field.FieldType.IsStored)
                 {

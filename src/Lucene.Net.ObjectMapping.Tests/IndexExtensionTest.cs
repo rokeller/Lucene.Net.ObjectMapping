@@ -84,15 +84,15 @@ namespace Lucene.Net.ObjectMapping.Tests
             Assert.AreEqual(1, writer.NumDocs);
 
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
+            DirectoryReader reader = DirectoryReader.Open(dir);
 
 
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "test", "object", "1234" });
 
-            var fields = MultiFields.GetFields(reader);
-            foreach (var field in fields)
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
@@ -157,19 +157,19 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(1, writer.NumDocs);
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
-            var nTerms = 0;
-            var fields = MultiFields.GetFields(reader);
-            foreach (var field in fields)
+            DirectoryReader reader = DirectoryReader.Open(dir);
+            int nTerms = 0;
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
                 {
                     if (String.Equals("String", field))
                     {
-                        var str = text.Utf8ToString();
+                        string str = text.Utf8ToString();
                         Assert.AreEqual("Test Object 9876", str );
                         nTerms++;
                     }
@@ -323,9 +323,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Verify that the updated item can be found.
                 TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
@@ -380,9 +380,9 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
-            using (var reader = DirectoryReader.Open(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
-                var searcher = new IndexSearcher(reader);
+                IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Verify that the updated item can be found.
                 TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
@@ -481,13 +481,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(1, writer.NumDocs);
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
+            DirectoryReader reader = DirectoryReader.Open(dir);
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "something", "else", "2345" });
 
-            var fields = MultiFields.GetFields(reader);
-            foreach (var field in fields)
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
@@ -585,13 +585,13 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(1, writer.NumDocs);
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
+            DirectoryReader reader = DirectoryReader.Open(dir);
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "completely", "different", "3456" });
 
-            var fields = MultiFields.GetFields(reader);
-            foreach (var field in fields)
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
@@ -685,12 +685,12 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(1, writer.NumDocs);
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
-            var fields = MultiFields.GetFields(reader);
-            var nTerms = 0;
-            foreach (var field in fields)
+            DirectoryReader reader = DirectoryReader.Open(dir);
+            Fields fields = MultiFields.GetFields(reader);
+            int nTerms = 0;
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
@@ -801,12 +801,12 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.Commit();
             Assert.AreEqual(1, writer.NumDocs);
 
-            var reader = DirectoryReader.Open(dir); //fixme: readonly flag ignored
-            var fields = MultiFields.GetFields(reader);
-            var nTerms = 0;
-            foreach (var field in fields)
+            DirectoryReader reader = DirectoryReader.Open(dir);
+            Fields fields = MultiFields.GetFields(reader);
+            int nTerms = 0;
+            foreach (string field in fields)
             {
-                var tms = fields.GetTerms(field);
+                Terms tms = fields.GetTerms(field);
                 TermsEnum termsEnum = tms.GetIterator(null);
                 BytesRef text = termsEnum.Next();
                 while (text != null)
@@ -1009,9 +1009,9 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             if (maxDeletedExclusive == 0 )
 
-            using (IndexReader reader = DirectoryReader.Open(dir)) //fixme: readonly flag ignored
+            using (IndexReader reader = DirectoryReader.Open(dir))
             {
-                var liveDocs = MultiFields.GetLiveDocs(reader);
+                IBits liveDocs = MultiFields.GetLiveDocs(reader);
                 if (liveDocs == null)
                 {
                     //If no records are deleted, liveDocs will be null

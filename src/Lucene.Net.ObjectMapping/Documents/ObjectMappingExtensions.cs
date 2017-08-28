@@ -114,7 +114,7 @@ namespace Lucene.Net.Documents
                 doc.Add(new Field(FieldSource, json, storedAndNotIndexFT));
             }
 
-            var longStoredAndNotIndexFT = new FieldType(Int64Field.TYPE_STORED);
+            FieldType longStoredAndNotIndexFT = new FieldType(Int64Field.TYPE_STORED);
             longStoredAndNotIndexFT.IsIndexed = false;
 
             doc.Add(new Int64Field(FieldTimestamp, DateTime.UtcNow.Ticks, longStoredAndNotIndexFT));

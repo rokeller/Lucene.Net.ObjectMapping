@@ -384,45 +384,36 @@ namespace Lucene.Net.Mapping
                 {
                     case MappedField.FieldType.Float:
                         {
-                            var bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
                             long l = NumericUtils.DoubleToSortableInt64(field.GetValueFromExpression<float>(term));
                             NumericUtils.Int64ToPrefixCoded(l, 0, bytes);
                             tm = new Term(field.Name, bytes);
-                            //queryTerm = NumericUtils.FloatToPrefixCoded(field.GetValueFromExpression<float>(term));
                             break;
                         }
 
                     case MappedField.FieldType.Double:
                         {
-                            var bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
                             long l = NumericUtils.DoubleToSortableInt64(field.GetValueFromExpression<double>(term));
                             NumericUtils.Int64ToPrefixCoded(l, 0, bytes);
                             tm = new Term(field.Name, bytes);
-                            //queryTerm = NumericUtils.DoubleToPrefixCoded(field.GetValueFromExpression<double>(term));
                             break;
                         }
+
                     case MappedField.FieldType.Short:
-                        {
-                            var bytes = new BytesRef(NumericUtils.BUF_SIZE_INT32);
-                            NumericUtils.Int32ToPrefixCoded(field.GetValueFromExpression<int>(term), 0, bytes);
-                            tm = new Term(field.Name, bytes);
-                            break;
-                        }
                     case MappedField.FieldType.Int:
                         {
-                            var bytes = new BytesRef(NumericUtils.BUF_SIZE_INT32);
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT32);
                             NumericUtils.Int32ToPrefixCoded(field.GetValueFromExpression<int>(term), 0, bytes);
                             tm = new Term(field.Name, bytes);
-                            //queryTerm = NumericUtils.IntToPrefixCoded(field.GetValueFromExpression<int>(term));
                             break;
                         }
 
                     case MappedField.FieldType.Long:
                         {
-                            var bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
                             NumericUtils.Int64ToPrefixCoded(field.GetValueFromExpression<long>(term), 0, bytes);
                             tm = new Term(field.Name, bytes);
-                            //queryTerm = NumericUtils.LongToPrefixCoded(field.GetValueFromExpression<long>(term));
                             break;
                         }
                     case MappedField.FieldType.String:
