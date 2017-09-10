@@ -378,41 +378,56 @@ namespace Lucene.Net.Mapping
                 Debug.Assert(null != field, "The mapped field must not be null.");
                 Debug.Assert(null != term, "The term must not be null.");
 
-                string queryTerm;
+                Term tm;
 
                 switch (field.Type)
                 {
                     case MappedField.FieldType.Float:
-                        queryTerm = NumericUtils.FloatToPrefixCoded(field.GetValueFromExpression<float>(term));
-                        break;
+                        {
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            long l = NumericUtils.DoubleToSortableInt64(field.GetValueFromExpression<float>(term));
+                            NumericUtils.Int64ToPrefixCoded(l, 0, bytes);
+                            tm = new Term(field.Name, bytes);
+                            break;
+                        }
 
                     case MappedField.FieldType.Double:
-                        queryTerm = NumericUtils.DoubleToPrefixCoded(field.GetValueFromExpression<double>(term));
-                        break;
+                        {
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            long l = NumericUtils.DoubleToSortableInt64(field.GetValueFromExpression<double>(term));
+                            NumericUtils.Int64ToPrefixCoded(l, 0, bytes);
+                            tm = new Term(field.Name, bytes);
+                            break;
+                        }
 
                     case MappedField.FieldType.Short:
-                        queryTerm = NumericUtils.IntToPrefixCoded(field.GetValueFromExpression<short>(term));
-                        break;
-
                     case MappedField.FieldType.Int:
-                        queryTerm = NumericUtils.IntToPrefixCoded(field.GetValueFromExpression<int>(term));
-                        break;
+                        {
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT32);
+                            NumericUtils.Int32ToPrefixCoded(field.GetValueFromExpression<int>(term), 0, bytes);
+                            tm = new Term(field.Name, bytes);
+                            break;
+                        }
 
                     case MappedField.FieldType.Long:
-                        queryTerm = NumericUtils.LongToPrefixCoded(field.GetValueFromExpression<long>(term));
-                        break;
-
+                        {
+                            BytesRef bytes = new BytesRef(NumericUtils.BUF_SIZE_INT64);
+                            NumericUtils.Int64ToPrefixCoded(field.GetValueFromExpression<long>(term), 0, bytes);
+                            tm = new Term(field.Name, bytes);
+                            break;
+                        }
                     case MappedField.FieldType.String:
-                        queryTerm = field.GetValueFromExpression<string>(term);
-                        break;
-
+                        {
+                            tm = new Term(field.Name, field.GetValueFromExpression<string>(term));
+                            break;
+                        }
                     default:
                         throw new InvalidOperationException(String.Format(
                             "Cannot make a TermQuery for field '{0}' of type {1}.",
                             field.Name, field.Type));
                 }
 
-                return new TermQuery(new Term(field.Name, queryTerm));
+                return new TermQuery(tm );
             }
 
             /// <summary>
@@ -451,7 +466,7 @@ namespace Lucene.Net.Mapping
                 switch (field.Type)
                 {
                     case MappedField.FieldType.Float:
-                        return NumericRangeQuery.NewFloatRange(field.Name,
+                        return NumericRangeQuery.NewDoubleRange(field.Name,
                                                                min.GetValue<float?>(),
                                                                max.GetValue<float?>(),
                                                                minInclusive.GetValue<bool>(),
@@ -465,21 +480,21 @@ namespace Lucene.Net.Mapping
                                                                 maxInclusive.GetValue<bool>());
 
                     case MappedField.FieldType.Short:
-                        return NumericRangeQuery.NewIntRange(field.Name,
+                        return NumericRangeQuery.NewInt32Range(field.Name,
                                                              min.GetValue<short?>(),
                                                              max.GetValue<short?>(),
                                                              minInclusive.GetValue<bool>(),
                                                              maxInclusive.GetValue<bool>());
 
                     case MappedField.FieldType.Int:
-                        return NumericRangeQuery.NewIntRange(field.Name,
+                        return NumericRangeQuery.NewInt32Range(field.Name,
                                                              min.GetValue<int?>(),
                                                              max.GetValue<int?>(),
                                                              minInclusive.GetValue<bool>(),
                                                              maxInclusive.GetValue<bool>());
 
                     case MappedField.FieldType.Long:
-                        return NumericRangeQuery.NewLongRange(field.Name,
+                        return NumericRangeQuery.NewInt64Range(field.Name,
                                                               min.GetValue<long?>(),
                                                               max.GetValue<long?>(),
                                                               minInclusive.GetValue<bool>(),

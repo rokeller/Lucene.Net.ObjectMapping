@@ -20,7 +20,7 @@ namespace Lucene.Net.Linq
         /// <param name="searcher">
         /// The Searcher to use.
         /// </param>
-        protected QueryProvider(Searcher searcher)
+        protected QueryProvider(IndexSearcher searcher)
         {
             if (null == searcher)
             {
@@ -117,7 +117,7 @@ namespace Lucene.Net.Linq
         /// <summary>
         /// Gets or sets the Searcher used with this instance.
         /// </summary>
-        internal Searcher Searcher { get; private set; }
+        internal IndexSearcher Searcher { get; private set; }
 
         #endregion
 

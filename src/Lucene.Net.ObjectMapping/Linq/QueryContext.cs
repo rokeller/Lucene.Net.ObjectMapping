@@ -69,7 +69,7 @@ namespace Lucene.Net.Linq
             }
 
             SortField[] fields = context.Sort.GetSort();
-            if (fields.Length != 1 || fields[0].Type != SortField.SCORE)
+            if (fields.Length != 1 || fields[0].Type != SortFieldType.SCORE)
             {
                 result.Sort = new Sort(fields);
             }

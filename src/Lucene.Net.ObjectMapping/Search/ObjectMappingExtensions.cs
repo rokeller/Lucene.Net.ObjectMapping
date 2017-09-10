@@ -23,7 +23,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An IQueryable of TElement.
         /// </returns>
-        public static IQueryable<TElement> AsQueryable<TElement>(this Searcher searcher)
+        public static IQueryable<TElement> AsQueryable<TElement>(this IndexSearcher searcher)
         {
             if (null == searcher)
             {
@@ -55,7 +55,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search(this Searcher searcher, Type type, Query query, int numResults)
+        public static TopDocs Search(this IndexSearcher searcher, Type type, Query query, int numResults)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter(type), numResults);
         }
@@ -81,7 +81,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search(this Searcher searcher, Type type, DocumentObjectTypeKind kind, Query query, int numResults)
+        public static TopDocs Search(this IndexSearcher searcher, Type type, DocumentObjectTypeKind kind, Query query, int numResults)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter(type, kind), numResults);
         }
@@ -104,7 +104,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search<TObject>(this Searcher searcher, Query query, int numResults)
+        public static TopDocs Search<TObject>(this IndexSearcher searcher, Query query, int numResults)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(), numResults);
         }
@@ -130,7 +130,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search<TObject>(this Searcher searcher, DocumentObjectTypeKind kind, Query query, int numResults)
+        public static TopDocs Search<TObject>(this IndexSearcher searcher, DocumentObjectTypeKind kind, Query query, int numResults)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(kind), numResults);
         }
@@ -160,7 +160,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search(this Searcher searcher, Type type, Query query, int numResults, Sort sort)
+        public static TopDocs Search(this IndexSearcher searcher, Type type, Query query, int numResults, Sort sort)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter(type), numResults, sort);
         }
@@ -189,7 +189,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search(this Searcher searcher, Type type, DocumentObjectTypeKind kind, Query query, int numResults, Sort sort)
+        public static TopDocs Search(this IndexSearcher searcher, Type type, DocumentObjectTypeKind kind, Query query, int numResults, Sort sort)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter(type, kind), numResults, sort);
         }
@@ -215,7 +215,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search<TObject>(this Searcher searcher, Query query, int numResults, Sort sort)
+        public static TopDocs Search<TObject>(this IndexSearcher searcher, Query query, int numResults, Sort sort)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(), numResults, sort);
         }
@@ -244,7 +244,7 @@ namespace Lucene.Net.Search
         /// <returns>
         /// An instance of TopDocs.
         /// </returns>
-        public static TopDocs Search<TObject>(this Searcher searcher, DocumentObjectTypeKind kind, Query query, int numResults, Sort sort)
+        public static TopDocs Search<TObject>(this IndexSearcher searcher, DocumentObjectTypeKind kind, Query query, int numResults, Sort sort)
         {
             return searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(kind), numResults, sort);
         }
@@ -268,7 +268,7 @@ namespace Lucene.Net.Search
         /// <param name="results">
         /// The Collector to use to gather results.
         /// </param>
-        public static void Search(this Searcher searcher, Type type, Query query, Collector results)
+        public static void Search(this IndexSearcher searcher, Type type, Query query, ICollector results)
         {
             searcher.Search(query, ObjectMapping.GetTypeFilter(type), results);
         }
@@ -291,7 +291,7 @@ namespace Lucene.Net.Search
         /// <param name="results">
         /// The Collector to use to gather results.
         /// </param>
-        public static void Search(this Searcher searcher, Type type, DocumentObjectTypeKind kind, Query query, Collector results)
+        public static void Search(this IndexSearcher searcher, Type type, DocumentObjectTypeKind kind, Query query, ICollector results)
         {
             searcher.Search(query, ObjectMapping.GetTypeFilter(type, kind), results);
         }
@@ -311,7 +311,7 @@ namespace Lucene.Net.Search
         /// <param name="results">
         /// The Collector to use to gather results.
         /// </param>
-        public static void Search<TObject>(this Searcher searcher, Query query, Collector results)
+        public static void Search<TObject>(this IndexSearcher searcher, Query query, ICollector results)
         {
             searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(), results);
         }
@@ -334,7 +334,7 @@ namespace Lucene.Net.Search
         /// <param name="results">
         /// The Collector to use to gather results.
         /// </param>
-        public static void Search<TObject>(this Searcher searcher, DocumentObjectTypeKind kind, Query query, Collector results)
+        public static void Search<TObject>(this IndexSearcher searcher, DocumentObjectTypeKind kind, Query query, ICollector results)
         {
             searcher.Search(query, ObjectMapping.GetTypeFilter<TObject>(kind), results);
         }

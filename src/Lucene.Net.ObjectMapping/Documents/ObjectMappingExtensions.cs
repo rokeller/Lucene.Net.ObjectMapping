@@ -41,7 +41,7 @@ namespace Lucene.Net.Documents
         /// </summary>
         private static readonly JsonSerializerSettings settings = new JsonSerializerSettings()
         {
-            TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
             TypeNameHandling = TypeNameHandling.Auto,
         };
 
@@ -99,15 +99,25 @@ namespace Lucene.Net.Documents
             Document doc = new Document();
             string json = JsonConvert.SerializeObject(source, typeof(TSource), settings);
 
-            doc.Add(new Field(FieldActualType, Utils.GetTypeName(source.GetType()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-            doc.Add(new Field(FieldStaticType, Utils.GetTypeName(typeof(TSource)), Field.Store.YES, Field.Index.NOT_ANALYZED));
+            FieldType ft = new FieldType(StringField.TYPE_STORED);
+            ft.OmitNorms = false;
+
+            doc.Add(new Field(FieldActualType, Utils.GetTypeName(source.GetType()), ft)); 
+            doc.Add(new Field(FieldStaticType, Utils.GetTypeName(typeof(TSource)), ft));
+
+            FieldType storedAndNotIndexFT = new FieldType(StringField.TYPE_STORED);
+            storedAndNotIndexFT.IsIndexed = false;
+
 
             if (mappingSettings.StoreSettings.StoreSource)
             {
-                doc.Add(new Field(FieldSource, json, Field.Store.YES, Field.Index.NO));
+                doc.Add(new Field(FieldSource, json, storedAndNotIndexFT));
             }
 
-            doc.Add(new NumericField(FieldTimestamp, Field.Store.YES, true).SetLongValue(DateTime.UtcNow.Ticks));
+            FieldType longStoredAndNotIndexFT = new FieldType(Int64Field.TYPE_STORED);
+            longStoredAndNotIndexFT.IsIndexed = false;
+
+            doc.Add(new Int64Field(FieldTimestamp, DateTime.UtcNow.Ticks, longStoredAndNotIndexFT));
 
             mappingSettings.ObjectMapper.AddToDocument<TSource>(source, doc);
 

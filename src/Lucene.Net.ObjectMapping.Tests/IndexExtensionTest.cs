@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Core;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -7,6 +8,7 @@ using Lucene.Net.Mapping;
 using Lucene.Net.ObjectMapping.Tests.Model;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Lucene.Net.Util;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -76,21 +78,31 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add(t);
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+
+            DirectoryReader reader = DirectoryReader.Open(dir);
+
+
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "test", "object", "1234" });
 
-            while (terms.Next())
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    Assert.True(expectedTerms.Contains(terms.Term.Text));
-                    expectedTerms.Remove(terms.Term.Text);
+                    if (String.Equals("String", field))
+                    {
+                        Assert.True(expectedTerms.Contains(text.Utf8ToString()));
+                        expectedTerms.Remove(text.Utf8ToString());
+                    }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -102,7 +114,7 @@ namespace Lucene.Net.ObjectMapping.Tests
         {
             try
             {
-                Index.ObjectMappingExtensions.Add(null, new object(), new StandardAnalyzer(Util.Version.LUCENE_30));
+                Index.ObjectMappingExtensions.Add(null, new object(), new StandardAnalyzer(Util.LuceneVersion.LUCENE_48));
                 Assert.Fail("Must get an exception.");
             }
             catch (ArgumentNullException ex)
@@ -112,7 +124,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             try
             {
-                writer.Add<object>(null, new StandardAnalyzer(Util.Version.LUCENE_30));
+                writer.Add<object>(null, new StandardAnalyzer(Util.LuceneVersion.LUCENE_48));
                 Assert.Fail("Must get an exception.");
             }
             catch (ArgumentNullException ex)
@@ -140,21 +152,28 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 9876",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add(t, new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+            DirectoryReader reader = DirectoryReader.Open(dir);
             int nTerms = 0;
-
-            while (terms.Next())
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    Assert.AreEqual("Test Object 9876", terms.Term.Text);
-                    nTerms++;
+                    if (String.Equals("String", field))
+                    {
+                        string str = text.Utf8ToString();
+                        Assert.AreEqual("Test Object 9876", str );
+                        nTerms++;
+                    }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -289,10 +308,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
             writer.Add(t);
             writer.Commit();
-            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -302,10 +321,12 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, o => o.String == "1234");
             writer.Commit();
-            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
+                IndexSearcher searcher = new IndexSearcher(reader);
+
                 // Verify that the updated item can be found.
                 TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
 
@@ -344,10 +365,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
             writer.Add(t, analyzer);
             writer.Commit();
-            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -357,10 +378,12 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, MappingSettings.Default, o => o.String == "Test Object 1234", analyzer);
             writer.Commit();
-            Assert.AreEqual(NumObjects + 1, writer.NumDocs());
+            Assert.AreEqual(NumObjects + 1, writer.NumDocs);
 
-            using (Searcher searcher = new IndexSearcher(dir))
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
             {
+                IndexSearcher searcher = new IndexSearcher(reader);
+
                 // Verify that the updated item can be found.
                 TestObject t3 = searcher.AsQueryable<TestObject>().Single(o => o.Number == 2345);
 
@@ -443,10 +466,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add(t);
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -456,20 +479,24 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, new TermQuery(new Term("String", "1234")));
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+            DirectoryReader reader = DirectoryReader.Open(dir);
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "something", "else", "2345" });
 
-            while (terms.Next())
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    if (expectedTerms.Contains(terms.Term.Text))
+                    if (expectedTerms.Contains(text.Utf8ToString()))
                     {
-                        expectedTerms.Remove(terms.Term.Text);
+                        expectedTerms.Remove(text.Utf8ToString());
                     }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -529,10 +556,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add<object>(t);
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -542,11 +569,11 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, DocumentObjectTypeKind.Static, new TermQuery(new Term("String", "1234")));
             writer.Commit();
-            Assert.AreEqual(2, writer.NumDocs());
+            Assert.AreEqual(2, writer.NumDocs);
 
             writer.DeleteDocuments<object>(new MatchAllDocsQuery());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t3 = new TestObject()
             {
@@ -556,20 +583,24 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t3, DocumentObjectTypeKind.Actual, new TermQuery(new Term("String", "2345")));
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+            DirectoryReader reader = DirectoryReader.Open(dir);
             HashSet<string> expectedTerms = new HashSet<string>(new string[] { "completely", "different", "3456" });
 
-            while (terms.Next())
+            Fields fields = MultiFields.GetFields(reader);
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    if (expectedTerms.Contains(terms.Term.Text))
+                    if (expectedTerms.Contains(text.Utf8ToString()))
                     {
-                        expectedTerms.Remove(terms.Term.Text);
+                        expectedTerms.Remove(text.Utf8ToString());
                     }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -639,10 +670,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add(t, new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -652,20 +683,26 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, new TermQuery(new Term("String", "Test Object 1234")), new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+            DirectoryReader reader = DirectoryReader.Open(dir);
+            Fields fields = MultiFields.GetFields(reader);
             int nTerms = 0;
-
-            while (terms.Next())
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    if (String.Equals("Something Else 2345", terms.Term.Text))
+                    if (String.Equals("String", field))
                     {
-                        nTerms++;
+                        if (String.Equals("Something Else 2345", text.Utf8ToString()))
+                        {
+                            nTerms++;
+                        }
                     }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -735,10 +772,10 @@ namespace Lucene.Net.ObjectMapping.Tests
                 String = "Test Object 1234",
             };
 
-            Assert.AreEqual(0, writer.NumDocs());
+            Assert.AreEqual(0, writer.NumDocs);
             writer.Add<object>(t, new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t2 = new TestObject()
             {
@@ -748,11 +785,11 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t2, DocumentObjectTypeKind.Static, new TermQuery(new Term("String", "Test Object 1234")), new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(2, writer.NumDocs());
+            Assert.AreEqual(2, writer.NumDocs);
 
             writer.DeleteDocuments<object>(new MatchAllDocsQuery());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
             TestObject t3 = new TestObject()
             {
@@ -762,20 +799,26 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.Update(t3, DocumentObjectTypeKind.Actual, new TermQuery(new Term("String", "Something Else 2345")), new KeywordAnalyzer());
             writer.Commit();
-            Assert.AreEqual(1, writer.NumDocs());
+            Assert.AreEqual(1, writer.NumDocs);
 
-            IndexReader reader = IndexReader.Open(dir, true);
-            TermEnum terms = reader.Terms();
+            DirectoryReader reader = DirectoryReader.Open(dir);
+            Fields fields = MultiFields.GetFields(reader);
             int nTerms = 0;
-
-            while (terms.Next())
+            foreach (string field in fields)
             {
-                if (String.Equals("String", terms.Term.Field))
+                Terms tms = fields.GetTerms(field);
+                TermsEnum termsEnum = tms.GetIterator(null);
+                BytesRef text = termsEnum.Next();
+                while (text != null)
                 {
-                    if (String.Equals("Completely Different 3456", terms.Term.Text))
+                    if (String.Equals("String", field))
                     {
-                        nTerms++;
+                        if (String.Equals("Completely Different 3456", text.Utf8ToString()))
+                        {
+                            nTerms++;
+                        }
                     }
+                    text = termsEnum.Next();
                 }
             }
 
@@ -824,7 +867,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxDeletedExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
             writer.Delete<TestObject>(t => t.Number.InRange(null, MaxDeletedExclusive, false, false));
             writer.Commit();
@@ -843,11 +886,11 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxDeletedExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
             writer.DeleteDocuments(
                 typeof(TestObject),
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             VerifyTestObjects(NumObjects, MaxDeletedExclusive);
@@ -860,12 +903,12 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxDeletedExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>()); // Static Type: Object, Actual Type: TestObject
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
             writer.DeleteDocuments(
                 typeof(TestObject),
                 DocumentObjectTypeKind.Static,
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             // No object must have been deleted yet, because the static type is set to Object, not TestObject.
@@ -874,7 +917,7 @@ namespace Lucene.Net.ObjectMapping.Tests
             writer.DeleteDocuments(
                 typeof(TestObject),
                 DocumentObjectTypeKind.Actual,
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             VerifyTestObjects(NumObjects, MaxDeletedExclusive);
@@ -887,10 +930,10 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxDeletedExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument());
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
             writer.DeleteDocuments<TestObject>(
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             VerifyTestObjects(NumObjects, MaxDeletedExclusive);
@@ -903,11 +946,11 @@ namespace Lucene.Net.ObjectMapping.Tests
             const int MaxDeletedExclusive = 5;
 
             WriteTestObjects(NumObjects, obj => obj.ToDocument<object>()); // Static Type: Object, Actual Type: TestObject
-            Assert.AreEqual(NumObjects, writer.NumDocs());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
 
             writer.DeleteDocuments<TestObject>(
                 DocumentObjectTypeKind.Static,
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             // No object must have been deleted yet, because the static type is set to Object, not TestObject.
@@ -915,7 +958,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             writer.DeleteDocuments<TestObject>(
                 DocumentObjectTypeKind.Actual,
-                NumericRangeQuery.NewLongRange("Number", null, MaxDeletedExclusive, false, false));
+                NumericRangeQuery.NewInt64Range("Number", null, MaxDeletedExclusive, false, false));
             writer.Commit();
 
             VerifyTestObjects(NumObjects, MaxDeletedExclusive);
@@ -927,7 +970,7 @@ namespace Lucene.Net.ObjectMapping.Tests
         public void SetUp()
         {
             dir = new RAMDirectory();
-            writer = new IndexWriter(dir, new StandardAnalyzer(Util.Version.LUCENE_30), true, IndexWriter.MaxFieldLength.LIMITED);
+            writer = new IndexWriter(dir, new IndexWriterConfig(Util.LuceneVersion.LUCENE_48, new StandardAnalyzer(Util.LuceneVersion.LUCENE_48)));
         }
 
         [TearDown]
@@ -962,19 +1005,29 @@ namespace Lucene.Net.ObjectMapping.Tests
 
         private void VerifyTestObjects(int count, int maxDeletedExclusive)
         {
-            Assert.AreEqual(count - maxDeletedExclusive, writer.NumDocs());
+            Assert.AreEqual(count - maxDeletedExclusive, writer.NumDocs);
 
-            using (IndexReader reader = IndexReader.Open(dir, true))
+            if (maxDeletedExclusive == 0 )
+
+            using (IndexReader reader = DirectoryReader.Open(dir))
             {
+                IBits liveDocs = MultiFields.GetLiveDocs(reader);
+                if (liveDocs == null)
+                {
+                    //If no records are deleted, liveDocs will be null
+                    Assert.AreEqual(0,maxDeletedExclusive);
+                    return;
+                }
+
                 for (int i = 0; i < count; i++)
                 {
                     if (i < maxDeletedExclusive)
                     {
-                        Assert.True(reader.IsDeleted(i));
+                        Assert.True(!liveDocs.Get(i));
                     }
                     else
                     {
-                        Assert.False(reader.IsDeleted(i));
+                        Assert.False(!liveDocs.Get(i));
                         Document doc = reader.Document(i);
                         TestObject obj = doc.ToObject<TestObject>();
                         Assert.AreEqual(i, obj.Number);
