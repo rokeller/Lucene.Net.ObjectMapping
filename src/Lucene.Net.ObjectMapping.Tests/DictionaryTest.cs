@@ -27,7 +27,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
             foreach (IIndexableField field in doc.Fields)
             {
-                if (field.FieldType.IsStored)
+                if (field.IndexableFieldType.IsStored)
                 {
                     // Ignore stored fields here.
                     continue;
@@ -38,116 +38,116 @@ namespace Lucene.Net.ObjectMapping.Tests
                 switch (field.Name)
                 {
                     case "Id":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.Id.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemA.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemA"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemA.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemA"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemA.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemA"].Text, field.GetStringValue());
                         break;
 
                     case "StringMap.ItemB.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemB"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemB.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemB"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemB.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemB"].Text, field.GetStringValue());
                         break;
 
                     case "StringMap.ItemC.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemC"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemC.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemC"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemC.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemC"].Text, field.GetStringValue());
                         break;
 
                     case "StringMap.ItemD.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemD"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemD.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemD"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemD.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemD"].Text, field.GetStringValue());
                         break;
 
                     case "StringMap.ItemE.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemE"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemE.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemE"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemE.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemE"].Text, field.GetStringValue());
                         break;
 
                     case "StringMap.ItemF.Date":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemF"].Date.Ticks.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemF.Index":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemF"].Index.ToString(), field.GetStringValue());
                         break;
 
                     case "StringMap.ItemF.Text":
-                        Assert.True(field.FieldType.IsTokenized);
-                        Assert.True(field.FieldType.IsIndexed);
+                        Assert.True(field.IndexableFieldType.IsTokenized);
+                        Assert.True(field.IndexableFieldType.IsIndexed);
                         Assert.AreEqual(obj.StringMap["ItemF"].Text, field.GetStringValue());
                         break;
 

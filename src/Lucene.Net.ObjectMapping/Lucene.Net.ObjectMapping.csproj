@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,10 +8,23 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.1.0-rc2</Version>
+    <Title>Lucene.Net.ObjectMapping</Title>
+    <Copyright>Copyright © Roger Keller 2015-2017</Copyright>
+    <Authors>Roger Keller</Authors>
+    <Language>en-US</Language>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/rokeller/Lucene.Net.ObjectMapping</PackageProjectUrl>
+    <PackageTags>lucene.net;lucene;objectmapping;mapping;search</PackageTags>
+    <PackageDescription>Map objects to Lucene.Net Documents and vice versa. Query for Documents based on their mapped types.</PackageDescription>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -24,6 +36,7 @@
     <DocumentationFile>bin\Debug\Lucene.Net.ObjectMapping.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -34,84 +47,18 @@
     <DocumentationFile>bin\Release\Lucene.Net.ObjectMapping.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\PublicKey.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DelaySign>true</DelaySign>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.4.8.0-beta00004\lib\net451\Lucene.Net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Lucene.Net.Analysis.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.Analysis.Common.4.8.0-beta00004\lib\net451\Lucene.Net.Analysis.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Lucene.Net.Queries, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.Queries.4.8.0-beta00004\lib\net451\Lucene.Net.Queries.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="SharpZipLib" Version="1.0.0-alpha2" />
+    <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
+    <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
+    <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-* " />
+    <PackageReference Include="Newtonsoft.Json" Version="10.*" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Documents\DocumentObjectTypeKind.cs" />
-    <Compile Include="Documents\ObjectMappingExtensions.cs" />
-    <Compile Include="Index\ObjectMappingExtensions.cs" />
-    <Compile Include="Linq\ExpressionUtil.cs" />
-    <Compile Include="Linq\LuceneQueryable.cs" />
-    <Compile Include="Linq\LuceneQueryBinder.cs" />
-    <Compile Include="Linq\LuceneQueryExecutor.cs" />
-    <Compile Include="Linq\QueryContext.cs" />
-    <Compile Include="Linq\QueryOperators.cs" />
-    <Compile Include="Linq\QueryProvider.cs" />
-    <Compile Include="Mapping\GenericFields.cs" />
-    <Compile Include="Mapping\IObjectMapper.cs" />
-    <Compile Include="Mapping\JsonFieldNameResolver.cs" />
-    <Compile Include="Mapping\JsonObjectMapper.cs" />
-    <Compile Include="Mapping\MappedField.cs" />
-    <Compile Include="Mapping\MappedFieldResolver.cs" />
-    <Compile Include="Mapping\MappedFieldResolver.FieldFinder.cs" />
-    <Compile Include="Mapping\MappedFieldResolver.QueryVisitor.cs" />
-    <Compile Include="Mapping\MappedFieldResolver.SortFieldVisitor.cs" />
-    <Compile Include="Mapping\MappingSettings.cs" />
-    <Compile Include="Mapping\StoreSettings.cs" />
-    <Compile Include="Mapping\TypeUtil.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Search\ObjectMapping.cs" />
-    <Compile Include="Search\ObjectMappingExtensions.cs" />
-    <Compile Include="Utils.cs" />
-  </ItemGroup>
+
   <ItemGroup>
     <None Include="Lucene.Net.ObjectMapping.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

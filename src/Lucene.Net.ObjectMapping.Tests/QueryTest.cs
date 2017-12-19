@@ -493,7 +493,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 // Query on string term match.
                 query = from t in searcher.AsQueryable<TestObject>()
-                        where t.String == "5"
+                        where t.SecondString == "abcdef5"
                         select t;
                 results = query.ToArray();
                 Assert.NotNull(results);
@@ -795,7 +795,6 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void ComparisionOfTwoMembers()
         {
             const int NumObjects = 10;
@@ -807,12 +806,11 @@ namespace Lucene.Net.ObjectMapping.Tests
             {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 // Try query comparing two members, which is not supported.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where (int)t.Enum == t.Number
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() => 
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where (int)t.Enum == t.Number
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
@@ -847,7 +845,6 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberMethodCall()
         {
             const int NumObjects = 10;
@@ -860,17 +857,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number.ToString() == "2"
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() => 
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number.ToString() == "2"
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic01()
         {
             const int NumObjects = 10;
@@ -883,17 +878,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number % 2 == 0
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number % 2 == 0
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic02()
         {
             const int NumObjects = 10;
@@ -906,17 +899,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number + 2 == 4
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number + 2 == 4
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic03()
         {
             const int NumObjects = 10;
@@ -929,12 +920,11 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number + t.Long == 4
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number + t.Long == 4
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
@@ -1297,6 +1287,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 {
                     Number = i,
                     String = String.Format("Test Object {0}", i),
+                    SecondString = String.Format("abcdef{0}", i),
                     Long = rng.Next(1000),
                     Float = 1.0101010101f * i,
                     Double = Math.PI * i,

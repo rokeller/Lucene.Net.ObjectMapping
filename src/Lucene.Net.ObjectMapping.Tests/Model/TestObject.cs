@@ -12,6 +12,7 @@ namespace Lucene.Net.ObjectMapping.Tests.Model
         public DateTime TimestampUtc { get; set; }
         public object Null { get; set; }
         public string String { get; set; }
+        public string SecondString { get; set; }
         public TimeSpan TimeSpan { get; set; }
         public Uri Uri { get; set; }
 

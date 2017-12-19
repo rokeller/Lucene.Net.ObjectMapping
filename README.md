@@ -69,5 +69,4 @@ Dependencies
 ------------
 This library depends on the following NuGet packages.
 * Lucene.Net
-* Lucene.Net.Contrib
 * Newtonsoft.Json
