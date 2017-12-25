@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.1.0-rc2</Version>
+    <Version>1.1.0-rc3</Version>
     <Title>Lucene.Net.ObjectMapping</Title>
     <Copyright>Copyright © Roger Keller 2015-2017</Copyright>
     <Authors>Roger Keller</Authors>
