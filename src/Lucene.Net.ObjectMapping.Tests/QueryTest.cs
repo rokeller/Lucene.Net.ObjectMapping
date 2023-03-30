@@ -493,7 +493,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                 // Query on string term match.
                 query = from t in searcher.AsQueryable<TestObject>()
-                        where t.String == "5"
+                        where t.SecondString == "abcdef5"
                         select t;
                 results = query.ToArray();
                 Assert.NotNull(results);
@@ -600,7 +600,7 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
-        public void ComplexEqualsAndNotEquals()
+        public void ComplexEqualsAndNotEqualsSortDescendingByTimestamp()
         {
             const int NumObjects = 10;
 
@@ -611,18 +611,19 @@ namespace Lucene.Net.ObjectMapping.Tests
             {
                 IndexSearcher searcher = new IndexSearcher(reader);
 
-                // Query on an exact number match.
+                // Query on string term meatches and mismatches.
                 IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.String == "object" && !(t.Number == 6)
-                                               orderby GenericField.Timestamp
+                                               where t.String == "test" && !(t.SecondString == "abcdef6")
+                                               orderby GenericField.Timestamp descending
                                                select t;
+
                 TestObject[] results = query.ToArray();
                 Assert.NotNull(results);
                 Assert.AreEqual(9, results.Length);
-                int lastNum = -1;
+                int lastNum = Int32.MaxValue;
                 foreach (TestObject result in results)
                 {
-                    Assert.Greater(result.Number, lastNum);
+                    Assert.Less(result.Number, lastNum);
                     lastNum = result.Number;
                     Assert.AreNotEqual(6, result.Number);
                 }
@@ -635,6 +636,46 @@ namespace Lucene.Net.ObjectMapping.Tests
                 Assert.NotNull(results);
                 Assert.AreEqual(1, results.Length);
                 Assert.AreEqual(6, results[0].Number);
+            }
+        }
+
+        [Test]
+        public void ComplexEqualsAndNotEqualsSortAscendingByTimestamp()
+        {
+            const int NumObjects = 10;
+
+            WriteTestObjects(NumObjects, obj => obj.ToDocument());
+            Assert.AreEqual(NumObjects, writer.NumDocs);
+
+            using (DirectoryReader reader = DirectoryReader.Open(dir))
+            {
+                IndexSearcher searcher = new IndexSearcher(reader);
+
+                // Query on string term match and number mismatch.
+                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
+                                               where t.String == "object" && !(t.Number == 5)
+                                               orderby GenericField.Timestamp
+                                               select t;
+
+                TestObject[] results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(9, results.Length);
+                int lastNum = Int32.MinValue;
+                foreach (TestObject result in results)
+                {
+                    Assert.Greater(result.Number, lastNum);
+                    lastNum = result.Number;
+                    Assert.AreNotEqual(5, result.Number);
+                }
+
+                // Query on an exact number match.
+                query = from t in searcher.AsQueryable<TestObject>()
+                        where t.String != "blah" && (t.Number == 9)
+                        select t;
+                results = query.ToArray();
+                Assert.NotNull(results);
+                Assert.AreEqual(1, results.Length);
+                Assert.AreEqual(9, results[0].Number);
             }
         }
 
@@ -795,7 +836,6 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void ComparisionOfTwoMembers()
         {
             const int NumObjects = 10;
@@ -807,12 +847,11 @@ namespace Lucene.Net.ObjectMapping.Tests
             {
                 IndexSearcher searcher = new IndexSearcher(reader);
                 // Try query comparing two members, which is not supported.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where (int)t.Enum == t.Number
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() => 
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where (int)t.Enum == t.Number
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
@@ -847,7 +886,6 @@ namespace Lucene.Net.ObjectMapping.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberMethodCall()
         {
             const int NumObjects = 10;
@@ -860,17 +898,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number.ToString() == "2"
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() => 
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number.ToString() == "2"
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic01()
         {
             const int NumObjects = 10;
@@ -883,17 +919,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number % 2 == 0
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number % 2 == 0
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic02()
         {
             const int NumObjects = 10;
@@ -906,17 +940,15 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number + 2 == 4
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number + 2 == 4
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void MemberArithmetic03()
         {
             const int NumObjects = 10;
@@ -929,12 +961,11 @@ namespace Lucene.Net.ObjectMapping.Tests
                 IndexSearcher searcher = new IndexSearcher(reader);
 
                 // Try query using a constant expression which evaluates to true, thus matching all.
-                IQueryable<TestObject> query = from t in searcher.AsQueryable<TestObject>()
-                                               where t.Number + t.Long == 4
-                                               orderby t.Number
-                                               select t;
-                TestObject[] results = query.ToArray();
-                Assert.Fail("Must get an exception.");
+                Assert.Throws<NotSupportedException>(() =>
+                    (from t in searcher.AsQueryable<TestObject>()
+                     where t.Number + t.Long == 4
+                     orderby t.Number
+                     select t).ToArray());
             }
         }
 
@@ -1297,6 +1328,7 @@ namespace Lucene.Net.ObjectMapping.Tests
                 {
                     Number = i,
                     String = String.Format("Test Object {0}", i),
+                    SecondString = String.Format("abcdef{0}", i),
                     Long = rng.Next(1000),
                     Float = 1.0101010101f * i,
                     Double = Math.PI * i,

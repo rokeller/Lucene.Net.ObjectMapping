@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,9 +8,16 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net.ObjectMapping.Tests</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFramework>$(TestTarget)</TargetFramework>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.1.0-rc3</Version>
+    <Copyright>Copyright © Roger Keller 2015-2017</Copyright>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -21,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -29,61 +36,25 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Lucene.Net, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.4.8.0-beta00004\lib\net451\Lucene.Net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Lucene.Net.Analysis.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lucene.Net.Analysis.Common.4.8.0-beta00004\lib\net451\Lucene.Net.Analysis.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="SharpZipLib" Version="1.*" />
+    <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
+    <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
+
+    <PackageReference Include="NUnit" Version="3.9.0 " />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DictionaryTest.cs" />
-    <Compile Include="IndexExtensionTest.cs" />
-    <Compile Include="Model\NestedTestObjectA.cs" />
-    <Compile Include="Model\NestedTestObjectB.cs" />
-    <Compile Include="Model\NestedTestObjectC.cs" />
-    <Compile Include="Model\ObjectWithDict.cs" />
-    <Compile Include="Model\SimpleObject.cs" />
-    <Compile Include="Model\TestObject.cs" />
-    <Compile Include="ObjectMappingTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryTest.cs" />
-    <Compile Include="SearchExtensionTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
+
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj">
       <Project>{7bf15aab-f8b6-4214-bbb2-1345b68cc4b2}</Project>
       <Name>Lucene.Net.ObjectMapping</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

@@ -32,6 +32,23 @@ namespace Lucene.Net.Documents
         /// </summary>
         public static readonly string FieldTimestamp = "$timestamp";
 
+        /// <summary>
+        /// The FieldType to use for the document types (dynamic and static type).
+        /// </summary>
+        private static readonly FieldType DocumentTypeFieldType = new FieldType(StringField.TYPE_STORED)
+        {
+            OmitNorms = false,
+        };
+
+        /// <summary>
+        /// The FieldType to use for the source field.
+        /// </summary>
+        private static readonly FieldType SourceFieldType = new FieldType(StringField.TYPE_STORED)
+        {
+            OmitNorms = false,
+            IsIndexed = false,
+        };
+
         #endregion
 
         #region Fields
@@ -99,25 +116,15 @@ namespace Lucene.Net.Documents
             Document doc = new Document();
             string json = JsonConvert.SerializeObject(source, typeof(TSource), settings);
 
-            FieldType ft = new FieldType(StringField.TYPE_STORED);
-            ft.OmitNorms = false;
-
-            doc.Add(new Field(FieldActualType, Utils.GetTypeName(source.GetType()), ft)); 
-            doc.Add(new Field(FieldStaticType, Utils.GetTypeName(typeof(TSource)), ft));
-
-            FieldType storedAndNotIndexFT = new FieldType(StringField.TYPE_STORED);
-            storedAndNotIndexFT.IsIndexed = false;
-
+            doc.Add(new Field(FieldActualType, Utils.GetTypeName(source.GetType()), DocumentTypeFieldType)); 
+            doc.Add(new Field(FieldStaticType, Utils.GetTypeName(typeof(TSource)), DocumentTypeFieldType));
 
             if (mappingSettings.StoreSettings.StoreSource)
             {
-                doc.Add(new Field(FieldSource, json, storedAndNotIndexFT));
+                doc.Add(new Field(FieldSource, json, SourceFieldType));
             }
 
-            FieldType longStoredAndNotIndexFT = new FieldType(Int64Field.TYPE_STORED);
-            longStoredAndNotIndexFT.IsIndexed = false;
-
-            doc.Add(new Int64Field(FieldTimestamp, DateTime.UtcNow.Ticks, longStoredAndNotIndexFT));
+            doc.Add(new Int64Field(FieldTimestamp, DateTime.UtcNow.Ticks, Field.Store.YES));
 
             mappingSettings.ObjectMapper.AddToDocument<TSource>(source, doc);
 
