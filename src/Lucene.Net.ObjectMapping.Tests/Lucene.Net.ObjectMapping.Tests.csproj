@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net.ObjectMapping.Tests</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping.Tests</AssemblyName>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>$(TestTarget)</TargetFramework>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
 
@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpZipLib" Version="1.0.0-alpha2" />
+    <PackageReference Include="SharpZipLib" Version="1.*" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
 

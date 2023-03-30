@@ -1,0 +1,12 @@
+<Project>
+    <PropertyGroup>
+        <LibraryTarget>netstandard2.0</LibraryTarget>
+        <TestTarget>net6.0</TestTarget>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(CI)' == 'true'">
+        <RestoreLockedMode>true</RestoreLockedMode>
+        <Deterministic>true</Deterministic>
+    </PropertyGroup>
+</Project>

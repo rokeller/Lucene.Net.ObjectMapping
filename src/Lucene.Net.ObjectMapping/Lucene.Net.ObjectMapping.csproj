@@ -8,8 +8,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>$(LibraryTarget)</TargetFramework>
     <FileAlignment>512</FileAlignment>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -49,11 +50,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpZipLib" Version="1.0.0-alpha2" />
+    <PackageReference Include="SharpZipLib" Version="1.*" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-* " />
-    <PackageReference Include="Newtonsoft.Json" Version="10.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.*" />
   </ItemGroup>
 
   <ItemGroup>
