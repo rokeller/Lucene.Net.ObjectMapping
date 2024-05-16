@@ -1,0 +1,62 @@
+name: PR
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+env:
+  SLN: lucene.net.objectmapping.sln
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore $SLN
+
+      - name: Build
+        run: |
+          dotnet build $SLN --no-restore
+
+      - name: Test
+        run: |
+          dotnet test $SLN --no-build --collect:'XPlat Code Coverage' \
+            --results-directory 'TestResults/Temp'
+
+      - name: Install report generator
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate report
+        run: |
+          reportgenerator -reports:"TestResults/Temp/*/coverage.cobertura.xml" \
+            -targetdir:coverage '-reporttypes:Html_Dark;MarkdownSummaryGithub'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: coverage/SummaryGithub.md
+
+      - name: Write to Job Summary
+        run: cat coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY

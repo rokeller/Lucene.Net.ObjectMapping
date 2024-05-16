@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  release:
+    types: [released]
+
+env:
+  SLN: lucene.net.objectmapping.sln
+  DOTNET_VERSIONS: |
+    6.0.x
+    8.0.x
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: |
+          dotnet restore $SLN
+
+      - name: Build
+        run: |
+          dotnet build $SLN --no-restore --configuration Release
+
+      - name: Test
+        run: |
+          dotnet test $SLN --no-build --configuration Release \
+            --collect:'XPlat Code Coverage' \
+            --results-directory 'TestResults/Temp'
+
+      - name: Install report generator
+        if: ${{ !cancelled() }}
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate report
+        if: ${{ !cancelled() }}
+        run: |
+          reportgenerator -reports:"TestResults/Temp/*/coverage.cobertura.xml" \
+            -targetdir:coverage '-reporttypes:Html_Dark;MarkdownSummaryGithub'
+
+      - name: Write to Job Summary
+        if: ${{ !cancelled() }}
+        run: cat coverage/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+  publish:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSIONS }}
+
+      - name: Get version
+        # Extract the version from the release tag.
+        run: |
+          TAG_NAME=$GITHUB_REF_NAME
+          VERSION=$(echo $TAG_NAME | sed -r 's/^v?([0-9.]+(-.+)?)$/\1/')
+          echo "Version=$VERSION" >> $GITHUB_ENV
+
+      - name: Create NuGet Package
+        run: |
+          dotnet pack $SLN --configuration Release --output packages/
+
+      - name: Publish NuGet Package
+        run: |
+          dotnet nuget push packages/*.nupkg -k $NUGET_AUTH_TOKEN \
+            -s https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
