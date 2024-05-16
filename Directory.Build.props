@@ -1,12 +1,20 @@
 <Project>
     <PropertyGroup>
-        <LibraryTarget>netstandard2.0</LibraryTarget>
-        <TestTarget>net6.0</TestTarget>
-        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+        <LibraryTargetFrameworks>net6.0;net8.0;netstandard2.0</LibraryTargetFrameworks>
+        <TestTargetFrameworks>net6.0;net8.0</TestTargetFrameworks>
+
+        <!-- We're taking a dependency on non-release packages from Lucene.net -->
+        <NoWarn>$(NoWarn);NU5104</NoWarn>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(CI)' == 'true'">
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <ContinuousIntegrationBuild Condition="'$(BUILD_REASON)' != ''">true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
         <RestoreLockedMode>true</RestoreLockedMode>
-        <Deterministic>true</Deterministic>
     </PropertyGroup>
 </Project>

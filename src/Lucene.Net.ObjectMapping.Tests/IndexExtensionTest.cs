@@ -93,16 +93,15 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (String.Equals("String", field))
                     {
                         Assert.True(expectedTerms.Contains(text.Utf8ToString()));
                         expectedTerms.Remove(text.Utf8ToString());
                     }
-                    text = termsEnum.Next();
                 }
             }
 
@@ -163,17 +162,16 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (String.Equals("String", field))
                     {
                         string str = text.Utf8ToString();
                         Assert.AreEqual("Test Object 9876", str );
                         nTerms++;
                     }
-                    text = termsEnum.Next();
                 }
             }
 
@@ -488,15 +486,14 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (expectedTerms.Contains(text.Utf8ToString()))
                     {
                         expectedTerms.Remove(text.Utf8ToString());
                     }
-                    text = termsEnum.Next();
                 }
             }
 
@@ -592,15 +589,14 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (expectedTerms.Contains(text.Utf8ToString()))
                     {
                         expectedTerms.Remove(text.Utf8ToString());
                     }
-                    text = termsEnum.Next();
                 }
             }
 
@@ -691,10 +687,10 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (String.Equals("String", field))
                     {
                         if (String.Equals("Something Else 2345", text.Utf8ToString()))
@@ -702,7 +698,6 @@ namespace Lucene.Net.ObjectMapping.Tests
                             nTerms++;
                         }
                     }
-                    text = termsEnum.Next();
                 }
             }
 
@@ -807,10 +802,10 @@ namespace Lucene.Net.ObjectMapping.Tests
             foreach (string field in fields)
             {
                 Terms tms = fields.GetTerms(field);
-                TermsEnum termsEnum = tms.GetIterator(null);
-                BytesRef text = termsEnum.Next();
-                while (text != null)
+                TermsEnum termsEnum = tms.GetEnumerator(null);
+                while (termsEnum.MoveNext())
                 {
+                    BytesRef text = termsEnum.Term;
                     if (String.Equals("String", field))
                     {
                         if (String.Equals("Completely Different 3456", text.Utf8ToString()))
@@ -818,7 +813,6 @@ namespace Lucene.Net.ObjectMapping.Tests
                             nTerms++;
                         }
                     }
-                    text = termsEnum.Next();
                 }
             }
 

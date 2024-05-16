@@ -1,60 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{91C415C0-8AA8-46AE-8107-1BF41283402D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net.ObjectMapping.Tests</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping.Tests</AssemblyName>
-    <TargetFramework>$(TestTarget)</TargetFramework>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>1.1.0-rc3</Version>
-    <Copyright>Copyright © Roger Keller 2015-2017</Copyright>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpZipLib" Version="1.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*"/>
+    <PackageReference Include="coverlet.collector" Version="6.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="6.*"/>
+
     <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
 
-    <PackageReference Include="NUnit" Version="3.9.0 " />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.*" />
+    <PackageReference Include="NUnit" Version="3.* " />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj">
-      <Project>{7bf15aab-f8b6-4214-bbb2-1345b68cc4b2}</Project>
-      <Name>Lucene.Net.ObjectMapping</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj"/>
   </ItemGroup>
 </Project>

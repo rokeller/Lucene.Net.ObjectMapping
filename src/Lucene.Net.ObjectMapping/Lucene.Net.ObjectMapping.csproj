@@ -1,65 +1,38 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping</AssemblyName>
-    <TargetFramework>$(LibraryTarget)</TargetFramework>
-    <FileAlignment>512</FileAlignment>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <Version>1.1.0-rc3</Version>
-    <Title>Lucene.Net.ObjectMapping</Title>
-    <Copyright>Copyright © Roger Keller 2015-2017</Copyright>
+  <PropertyGroup Label="NuSpec">
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Authors>Roger Keller</Authors>
-    <Language>en-US</Language>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/rokeller/Lucene.Net.ObjectMapping</PackageProjectUrl>
-    <PackageTags>lucene.net;lucene;objectmapping;mapping;search</PackageTags>
     <PackageDescription>Map objects to Lucene.Net Documents and vice versa. Query for Documents based on their mapped types.</PackageDescription>
-    <IncludeSymbols>true</IncludeSymbols>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Lucene.Net.ObjectMapping.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Lucene.Net.ObjectMapping.XML</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
+    <PackageTags>lucene.net;lucene;objectmapping;mapping;search</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <DebugType>Embedded</DebugType>
+    <EmbedAllSources>True</EmbedAllSources>
+    <Features>strict</Features>
+    <RepositoryUrl>https://github.com/$(GITHUB_REPOSITORY)</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>$(GITHUB_REF_NAME)</RepositoryBranch>
+    <RepositoryCommit>$(GITHUB_SHA)</RepositoryCommit>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SharpZipLib" Version="1.*" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-* " />
     <PackageReference Include="Newtonsoft.Json" Version="13.*" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Lucene.Net.ObjectMapping.nuspec">
-      <SubType>Designer</SubType>
-    </None>
+  <ItemGroup Label="NuSpec">
+    <None Include="$(MSBuildThisFileDirectory)../../docs/README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
