@@ -33,7 +33,7 @@ myIndexWriter.Add(myObject, myAnalyzer);
 ```
 
 Updating existing documents is just as easy. Like the `UpdateDocument` method on
-the `IndexReader`, it will delete the documents that match the given query and
+the `IndexWriter`, it will delete the documents that match the given query and
 then just add the new document. Use it like this:
 
 ```csharp
@@ -45,11 +45,12 @@ myIndexWriter.Update(myObject, new TermQuery(new Term("Id", myObject.Id)), myAna
 Please note that it is not necessary to filter for the document type in your
 query. The `Update` method does it automatically.
 
-Search for Documents mapped from a specifc class using the extensions to the
-Searcher, e.g. like this:
+Search for Documents mapped from a specific class using the extensions to the
+`IndexSearcher`, e.g. like this:
 
 ```csharp
 mySearcher.Search<MyClass>(myQuery, numResultsToReturn, mySort);
 ```
 
-There are other extensions to the Searcher to, also non-generic ones just in case.
+There are other extensions to the `IndexSearcher` to, also non-generic ones in
+case those are needed.
