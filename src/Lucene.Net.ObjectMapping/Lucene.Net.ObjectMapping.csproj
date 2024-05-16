@@ -4,6 +4,8 @@
     <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.ObjectMapping</AssemblyName>
     <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Label="NuSpec">
