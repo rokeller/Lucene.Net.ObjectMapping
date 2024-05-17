@@ -1,0 +1,40 @@
+﻿@using DirectoryWeb.Models
+@model SearchRequest
+
+@{
+    ViewData["Title"] = "Directory";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Directory</h1>
+
+    <a asp-action="Index">Back to list</a>
+
+    <h2>Search</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <p>
+                Please note that the name you enter below is interpreted as a
+                single term, and therefore must match completely on either the
+                first name or the last name.
+            </p>
+            <p>
+                For example, searching for <em>walter</em> will match both
+                <em>Walt</em> (aka Heisenberg) and <em>Walter Jr.</em> in the
+                sample data that can be <a asp-action="Seed">seeded</a>.
+                Searching for <em>jr</em> however will only result in
+                <em>Walter Jr.</em> being found.
+            </p>
+            <form asp-action="Search">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <input type="submit" value="Search" class="btn btn-primary" />
+            </form>
+        </div>
+    </div>
+</div>

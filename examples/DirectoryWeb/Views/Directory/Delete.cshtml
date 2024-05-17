@@ -1,0 +1,25 @@
+﻿@using DirectoryWeb.Models
+@model Person
+
+@{
+    ViewData["Title"] = "Directory";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Delete from directory?</h1>
+
+    <p>
+        Are you sure you want to delete
+        <strong>
+            @Html.DisplayFor(item => Model.LastName),
+            @Html.DisplayFor(item => Model.FirstName)
+        </strong>
+        ?
+    </p>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
