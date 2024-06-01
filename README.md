@@ -4,7 +4,9 @@ Mapping of .NET objects to Lucene.Net Documents and vice versa.
 
 ## Installation
 
-Simply [install the `Lucene.Net.ObjectMapping` NuGet package](https://www.nuget.org/packages/Lucene.Net.ObjectMapping/).
+Simply install the latest pre-release of the
+[Lucene.Net.ObjectMapping NuGet package](https://www.nuget.org/packages/Lucene.Net.ObjectMapping/).
+It targets the recent pre-releases of the Lucene.Net and related packages.
 
 ## How To Use It
 
@@ -62,3 +64,9 @@ mySearcher.Search<MyClass>(myQuery, numResultsToReturn, mySort);
 
 There are other extensions to the `IndexSearcher` to, also non-generic ones in
 case those are needed.
+
+## More Examples
+
+You can find more examples in the [examples/](examples/) directory:
+
+* [DirectoryWeb](examples/DirectoryWeb/) - person directory of a fictional school
