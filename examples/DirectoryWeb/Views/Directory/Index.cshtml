@@ -1,0 +1,37 @@
+﻿@using DirectoryWeb.Models
+@model IReadOnlyCollection<Person>
+
+@{
+    ViewData["Title"] = "Directory";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Directory</h1>
+
+    <a asp-action="Seed">Clean directory and seed</a> |
+    <a asp-action="Search">Search</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Last name</th>
+                <th>First name</th>
+                <th>Role</th>
+                <th>Year of birth</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Person person in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(item => person.LastName)</td>
+                    <td>@Html.DisplayFor(item => person.FirstName)</td>
+                    <td>@(person.GetType().Name)</td>
+                    <td>@Html.DisplayFor(item => person.YearOfBirth)</td>
+                    <td><a asp-action="Delete" asp-route-id="@person.Id">Delete</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
