@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F1F4AD80-32A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ObjectMapping", "src\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj", "{7BF15AAB-F8B6-4214-BBB2-1345B68CC4B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ObjectMapping.Tests", "src\Lucene.Net.ObjectMapping.Tests\Lucene.Net.ObjectMapping.Tests.csproj", "{91C415C0-8AA8-46AE-8107-1BF41283402D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.ObjectMapping.Tests", "test\Lucene.Net.ObjectMapping.Tests\Lucene.Net.ObjectMapping.Tests.csproj", "{91C415C0-8AA8-46AE-8107-1BF41283402D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

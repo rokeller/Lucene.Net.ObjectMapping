@@ -21,6 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj"/>
+    <ProjectReference Include="..\..\src\Lucene.Net.ObjectMapping\Lucene.Net.ObjectMapping.csproj"/>
   </ItemGroup>
 </Project>
