@@ -1,7 +1,7 @@
 <Project>
     <PropertyGroup>
-        <LibraryTargetFrameworks>net8.0;netstandard2.0</LibraryTargetFrameworks>
-        <TestTargetFrameworks>net8.0</TestTargetFrameworks>
+        <LibraryTargetFrameworks>net8.0;net10.0;netstandard2.0</LibraryTargetFrameworks>
+        <TestTargetFrameworks>net8.0;net10.0</TestTargetFrameworks>
 
         <!-- We're taking a dependency on non-release packages from Lucene.net -->
         <NoWarn>$(NoWarn);NU5104</NoWarn>

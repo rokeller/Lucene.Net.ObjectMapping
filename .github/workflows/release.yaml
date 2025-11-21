@@ -7,8 +7,8 @@ on:
 env:
   SLN: lucene.net.objectmapping.sln
   DOTNET_VERSIONS: |
-    6.0.x
     8.0.x
+    10.0.x
 
 jobs:
   build-test:
