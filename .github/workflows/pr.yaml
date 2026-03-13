@@ -53,7 +53,7 @@ jobs:
             -targetdir:coverage '-reporttypes:Html_Dark;MarkdownSummaryGithub'
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           recreate: true
           path: coverage/SummaryGithub.md
