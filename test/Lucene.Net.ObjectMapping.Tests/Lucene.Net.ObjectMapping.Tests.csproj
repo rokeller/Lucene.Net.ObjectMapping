@@ -16,7 +16,7 @@
     <PackageReference Include="Lucene.Net" Version="4.8.0-* " />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-* " />
 
-    <PackageReference Include="NUnit" Version="3.* " />
+    <PackageReference Include="NUnit" Version="4.* " />
     <PackageReference Include="NUnit3TestAdapter" Version="3.*" />
   </ItemGroup>
 
