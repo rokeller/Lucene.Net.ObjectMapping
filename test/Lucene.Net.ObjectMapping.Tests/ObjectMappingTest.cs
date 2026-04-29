@@ -348,7 +348,7 @@ namespace Lucene.Net.ObjectMapping.Tests
 
                         case "$source":
                         default:
-                            Assert.Fail("Unspected stored field: {0}", field.Name);
+                            Assert.Fail($"Unspected stored field: {field.Name}");
                             break;
                     }
                 }
