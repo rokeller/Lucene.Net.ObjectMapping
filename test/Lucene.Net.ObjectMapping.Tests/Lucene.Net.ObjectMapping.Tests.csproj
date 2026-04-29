@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*"/>
-    <PackageReference Include="coverlet.collector" Version="6.*">
+    <PackageReference Include="coverlet.collector" Version="10.*">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
