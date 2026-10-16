@@ -5,8 +5,8 @@
       "Lucene.Net": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "7LLWS9nNwx01AyE/KXMh+qdAlzDkRANE8407AO/wEmLL1InzVKFwfsRdRmwg4ILOMFui4xZ1Y54eqvzo3Tf9Vw==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "iBkkpkDbAHjpZ0dnukFnWnjxSNmsRHOSxrYBBKbtcYJZ8PQRrKsqGGyNm8xmh4ORvsJ1WM7i5A9whiyA8WhNrQ==",
         "dependencies": {
           "J2N": "[2.1.0, 3.0.0)",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
@@ -16,20 +16,20 @@
       "Lucene.Net.Analysis.Common": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "rPpmww/HgwEwhvfvZgdWITxFsWRoCEpP3+WQBFgbGxTn4eLDr3U/oFoe8KS+8jUNAl2+5atErDrW5JOcFG+gcQ==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "35M1i4enb8rVeqXiKgDJzgqYDa5VtpgI2sK5gYg1Yd9kmpjPmaLHgN9/rGyHd67XWhT7fh0X8UuXu70PH58pcA==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017",
+          "Lucene.Net": "4.8.0-beta00018",
           "System.Memory": "4.5.5"
         }
       },
       "Lucene.Net.Queries": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "RVpZCfa/7pgvytFw64zLqinvZPQt4TojvcFghdAA5vhnpSs5GTbtciPIxFH3wwH3f2dYJywiqYKo1h3JBCXRBA==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "cS+Ea3m4ZcCId9MgYfgAs6UNiYfxykpNIZlf7nRPH/7zOa+TePX5ATM+0FLQu54bAkgWVAwV1T269PD0oQsToQ==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017"
+          "Lucene.Net": "4.8.0-beta00018"
         }
       },
       "NETStandard.Library": {
@@ -113,8 +113,8 @@
       "Lucene.Net": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "7LLWS9nNwx01AyE/KXMh+qdAlzDkRANE8407AO/wEmLL1InzVKFwfsRdRmwg4ILOMFui4xZ1Y54eqvzo3Tf9Vw==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "iBkkpkDbAHjpZ0dnukFnWnjxSNmsRHOSxrYBBKbtcYJZ8PQRrKsqGGyNm8xmh4ORvsJ1WM7i5A9whiyA8WhNrQ==",
         "dependencies": {
           "J2N": "[2.1.0, 3.0.0)",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
@@ -123,19 +123,19 @@
       "Lucene.Net.Analysis.Common": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "rPpmww/HgwEwhvfvZgdWITxFsWRoCEpP3+WQBFgbGxTn4eLDr3U/oFoe8KS+8jUNAl2+5atErDrW5JOcFG+gcQ==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "35M1i4enb8rVeqXiKgDJzgqYDa5VtpgI2sK5gYg1Yd9kmpjPmaLHgN9/rGyHd67XWhT7fh0X8UuXu70PH58pcA==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017"
+          "Lucene.Net": "4.8.0-beta00018"
         }
       },
       "Lucene.Net.Queries": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "RVpZCfa/7pgvytFw64zLqinvZPQt4TojvcFghdAA5vhnpSs5GTbtciPIxFH3wwH3f2dYJywiqYKo1h3JBCXRBA==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "cS+Ea3m4ZcCId9MgYfgAs6UNiYfxykpNIZlf7nRPH/7zOa+TePX5ATM+0FLQu54bAkgWVAwV1T269PD0oQsToQ==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017"
+          "Lucene.Net": "4.8.0-beta00018"
         }
       },
       "Newtonsoft.Json": {
@@ -167,8 +167,8 @@
       "Lucene.Net": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "7LLWS9nNwx01AyE/KXMh+qdAlzDkRANE8407AO/wEmLL1InzVKFwfsRdRmwg4ILOMFui4xZ1Y54eqvzo3Tf9Vw==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "iBkkpkDbAHjpZ0dnukFnWnjxSNmsRHOSxrYBBKbtcYJZ8PQRrKsqGGyNm8xmh4ORvsJ1WM7i5A9whiyA8WhNrQ==",
         "dependencies": {
           "J2N": "[2.1.0, 3.0.0)",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
@@ -177,19 +177,19 @@
       "Lucene.Net.Analysis.Common": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "rPpmww/HgwEwhvfvZgdWITxFsWRoCEpP3+WQBFgbGxTn4eLDr3U/oFoe8KS+8jUNAl2+5atErDrW5JOcFG+gcQ==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "35M1i4enb8rVeqXiKgDJzgqYDa5VtpgI2sK5gYg1Yd9kmpjPmaLHgN9/rGyHd67XWhT7fh0X8UuXu70PH58pcA==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017"
+          "Lucene.Net": "4.8.0-beta00018"
         }
       },
       "Lucene.Net.Queries": {
         "type": "Direct",
         "requested": "[4.8.0-*, )",
-        "resolved": "4.8.0-beta00017",
-        "contentHash": "RVpZCfa/7pgvytFw64zLqinvZPQt4TojvcFghdAA5vhnpSs5GTbtciPIxFH3wwH3f2dYJywiqYKo1h3JBCXRBA==",
+        "resolved": "4.8.0-beta00018",
+        "contentHash": "cS+Ea3m4ZcCId9MgYfgAs6UNiYfxykpNIZlf7nRPH/7zOa+TePX5ATM+0FLQu54bAkgWVAwV1T269PD0oQsToQ==",
         "dependencies": {
-          "Lucene.Net": "4.8.0-beta00017"
+          "Lucene.Net": "4.8.0-beta00018"
         }
       },
       "Newtonsoft.Json": {
